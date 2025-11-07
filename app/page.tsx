@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ExternalLink, Building2, TrendingUp } from 'lucide-react'
-import { apiClient, Sector } from '@/lib/api'
+import { apiClient, Sector } from '../lib/api'
 
 export default function HomePage() {
   const [sectors, setSectors] = useState<Sector[]>([])

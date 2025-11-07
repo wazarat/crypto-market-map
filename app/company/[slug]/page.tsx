@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2 } from 'lucide-react'
-import { apiClient, CompanyDetail, ResearchEntry } from '@/lib/api'
-import { supabase, UserNote } from '@/lib/supabase'
+import { apiClient, CompanyDetail, ResearchEntry } from '../../lib/api'
+import { supabase, UserNote } from '../../lib/supabase'
 
 // Mock user ID - replace with real auth later
 const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4-a716-446655440000'
