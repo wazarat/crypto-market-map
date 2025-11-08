@@ -86,10 +86,10 @@ const mockSectors: Sector[] = [
   },
   {
     id: '4',
-    name: 'Exchange Services (Centralized)',
-    slug: 'exchange-centralized',
-    description: 'Centralized cryptocurrency exchanges and trading platforms',
-    company_count: 8,
+    name: 'Exchange Services',
+    slug: 'exchange-services',
+    description: 'Centralized and decentralized cryptocurrency exchanges and trading platforms',
+    company_count: 14,
     companies: [
       { id: '19', name: 'Binance', slug: 'binance', short_summary: 'World\'s largest cryptocurrency exchange', website: 'https://binance.com' },
       { id: '20', name: 'Coinbase', slug: 'coinbase', logo_url: 'https://cryptologos.cc/logos/coinbase-coin-logo.png', short_summary: 'Leading US cryptocurrency exchange', website: 'https://coinbase.com' },
@@ -98,16 +98,7 @@ const mockSectors: Sector[] = [
       { id: '23', name: 'Gemini', slug: 'gemini', short_summary: 'Regulated crypto exchange and custody', website: 'https://gemini.com' },
       { id: '24', name: 'KuCoin', slug: 'kucoin', short_summary: 'Global cryptocurrency exchange', website: 'https://kucoin.com' },
       { id: '25', name: 'Huobi', slug: 'huobi', short_summary: 'Global cryptocurrency exchange', website: 'https://huobi.com' },
-      { id: '26', name: 'OKX', slug: 'okx', short_summary: 'Global crypto exchange and Web3 platform', website: 'https://okx.com' }
-    ]
-  },
-  {
-    id: '5',
-    name: 'Exchange Services (Decentralized)',
-    slug: 'exchange-decentralized',
-    description: 'Decentralized exchanges and automated market makers',
-    company_count: 6,
-    companies: [
+      { id: '26', name: 'OKX', slug: 'okx', short_summary: 'Global crypto exchange and Web3 platform', website: 'https://okx.com' },
       { id: '27', name: 'Uniswap', slug: 'uniswap', logo_url: 'https://cryptologos.cc/logos/uniswap-uni-logo.png', short_summary: 'Leading decentralized exchange protocol', website: 'https://uniswap.org' },
       { id: '28', name: 'SushiSwap', slug: 'sushiswap', short_summary: 'Community-driven decentralized exchange', website: 'https://sushi.com' },
       { id: '29', name: 'PancakeSwap', slug: 'pancakeswap', short_summary: 'Leading DEX on Binance Smart Chain', website: 'https://pancakeswap.finance' },
@@ -117,7 +108,7 @@ const mockSectors: Sector[] = [
     ]
   },
   {
-    id: '6',
+    id: '5',
     name: 'Lending and Borrowing Services',
     slug: 'lending-borrowing',
     description: 'DeFi and CeFi lending, borrowing, and yield generation platforms',
@@ -133,7 +124,7 @@ const mockSectors: Sector[] = [
     ]
   },
   {
-    id: '7',
+    id: '6',
     name: 'Virtual Asset Derivative Services',
     slug: 'derivatives',
     description: 'Futures, options, and derivative trading platforms',
@@ -147,7 +138,7 @@ const mockSectors: Sector[] = [
     ]
   },
   {
-    id: '8',
+    id: '7',
     name: 'Virtual Asset Management and Investment Services',
     slug: 'asset-management',
     description: 'Investment funds, ETFs, and asset management services',
@@ -162,7 +153,7 @@ const mockSectors: Sector[] = [
     ]
   },
   {
-    id: '9',
+    id: '8',
     name: 'Virtual Asset Transfer and Settlement Services',
     slug: 'transfer-settlement',
     description: 'Payment processing, remittance, and settlement services',
@@ -176,7 +167,7 @@ const mockSectors: Sector[] = [
     ]
   },
   {
-    id: '10',
+    id: '9',
     name: 'Fiat Referenced Token Issuance Services',
     slug: 'fiat-tokens',
     description: 'Stablecoins and fiat-backed digital currencies',
@@ -189,7 +180,7 @@ const mockSectors: Sector[] = [
     ]
   },
   {
-    id: '11',
+    id: '10',
     name: 'Asset Referenced Token Issuance Services',
     slug: 'asset-tokens',
     description: 'Tokenization of real-world assets and commodities',
@@ -211,7 +202,7 @@ const mockCompanyDetails: { [key: string]: CompanyDetail } = {
     logo_url: 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
     short_summary: 'Uniswap is a decentralized trading protocol, known for its role in facilitating automated trading of decentralized finance (DeFi) tokens. Built on Ethereum, Uniswap uses automated market makers (AMMs) instead of traditional order books, enabling permissionless and non-custodial trading.',
     website: 'https://uniswap.org',
-    sector_name: 'Exchange Services (Decentralized)'
+    sector_name: 'Exchange Services'
   },
   'coinbase': {
     id: '20',
@@ -220,7 +211,7 @@ const mockCompanyDetails: { [key: string]: CompanyDetail } = {
     logo_url: 'https://cryptologos.cc/logos/coinbase-coin-logo.png',
     short_summary: 'Coinbase is a leading cryptocurrency exchange platform that provides secure and compliant digital asset trading services. Founded in 2012, it serves both retail and institutional clients with a comprehensive suite of crypto financial services.',
     website: 'https://coinbase.com',
-    sector_name: 'Exchange Services (Centralized)'
+    sector_name: 'Exchange Services'
   },
   'aave': {
     id: '33',
