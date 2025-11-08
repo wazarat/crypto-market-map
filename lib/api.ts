@@ -1,5 +1,6 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-const USE_MOCK_DATA = !process.env.NEXT_PUBLIC_API_URL
+const HAS_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const USE_MOCK_DATA = process.env.USE_MOCK_DATA === 'true' || (!HAS_SUPABASE && (!process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL.includes('localhost')))
 
 export interface Company {
   id: string
