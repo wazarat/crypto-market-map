@@ -19,7 +19,7 @@ interface Company {
 export default function SectorDataPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const sector = searchParams.get('sector') || 'exchange-services'
+  const sector = searchParams?.get('sector') || 'exchange-services'
   
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
