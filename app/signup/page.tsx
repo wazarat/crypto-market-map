@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff, Lock, User, Mail, Building2, Briefcase, Phone, CheckCircle } from 'lucide-react'
-import { useSupabaseAuth } from '../../lib/supabase-auth-context'
+import { useSimpleAuth } from '../../lib/simple-auth-context'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -21,7 +21,10 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   
-  const { signUp } = useSupabaseAuth()
+  // Temporarily disable signup - use simple auth for now
+  const signUp = async (data: any) => {
+    return { success: false, message: 'Signup temporarily disabled. Please contact admin.' }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

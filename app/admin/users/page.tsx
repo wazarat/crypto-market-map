@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Check, X, Clock, User, Building2, Mail, Phone, Calendar } from 'lucide-react'
 import { supabaseAuth, UserProfile } from '../../../lib/supabase-auth'
-import { useSupabaseAuth, withSupabaseAuth } from '../../../lib/supabase-auth-context'
+import { useSimpleAuth, withSimpleAuth } from '../../../lib/simple-auth-context'
 
 function AdminUsersPage() {
   const [pendingUsers, setPendingUsers] = useState<UserProfile[]>([])
@@ -12,7 +12,7 @@ function AdminUsersPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const { user } = useSupabaseAuth()
+  const { user } = useSimpleAuth()
 
   useEffect(() => {
     fetchPendingUsers()
@@ -312,4 +312,4 @@ function UserCard({
   )
 }
 
-export default withSupabaseAuth(AdminUsersPage, { requireAdmin: true })
+export default withSimpleAuth(AdminUsersPage)

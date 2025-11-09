@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { ExternalLink, Building2, TrendingUp, LogOut, User } from 'lucide-react'
 import { unifiedApiClient } from '../lib/unified-api'
 import { Sector } from '../lib/api'
-import { useSupabaseAuth } from '../lib/supabase-auth-context'
+import { useSimpleAuth } from '../lib/simple-auth-context'
 
 export default function HomePage() {
   const [sectors, setSectors] = useState<Sector[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  const { profile, isAuthenticated, isAdmin, signOut } = useSupabaseAuth()
+  const { user, isAuthenticated, signOut } = useSimpleAuth()
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -76,7 +76,7 @@ export default function HomePage() {
                 <a href="#" className="text-gray-600 hover:text-gray-900">Companies</a>
                 <a href="#" className="text-gray-600 hover:text-gray-900">Research</a>
                 <a href="#" className="text-gray-600 hover:text-gray-900">About</a>
-                {isAdmin && (
+                {user?.email === 'waz@canhav.com' && (
                   <Link href="/admin" className="text-indigo-600 hover:text-indigo-700 font-medium">
                     Admin
                   </Link>
@@ -89,7 +89,7 @@ export default function HomePage() {
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                       <User className="h-4 w-4" />
-                      <span>{profile?.full_name}</span>
+                      <span>{user?.email}</span>
                     </div>
                     <button
                       onClick={signOut}
@@ -144,7 +144,7 @@ export default function HomePage() {
 }
 
 function SectorCard({ sector }: { sector: Sector }) {
-  const { isAuthenticated } = useSupabaseAuth()
+  const { isAuthenticated } = useSimpleAuth()
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200 transition-all duration-200">
       <div className="flex items-center justify-between mb-4">
