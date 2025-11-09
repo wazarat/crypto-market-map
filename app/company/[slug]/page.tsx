@@ -10,6 +10,8 @@ import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2, Edit
 import { unifiedApiClient } from '../../../lib/unified-api'
 import { CompanyDetail, ResearchEntry } from '../../../lib/api'
 import { supabase, UserNote } from '../../../lib/supabase'
+import { vaspApiClient } from '../../../lib/vasp-api'
+import SectorSpecificSections from '../../../components/SectorSpecificSections'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
 import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
 import ChatbaseWidgetSimple from '../../../components/ChatbaseWidgetSimple'
@@ -35,6 +37,9 @@ function CompanyPage() {
   const [error, setError] = useState<string | null>(null)
   const [newNote, setNewNote] = useState('')
   const [savingNote, setSavingNote] = useState(false)
+  const [sectorSpecificData, setSectorSpecificData] = useState<any>({})
+  const [isEditing, setIsEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -46,6 +51,18 @@ function CompanyPage() {
         
         setCompany(companyData as CompanyDetail)
         setResearch(researchData as ResearchEntry[])
+        
+        // Fetch sector-specific data if using Supabase
+        if (companyData && unifiedApiClient.hasVASPFeatures()) {
+          try {
+            const vaspCompany = await vaspApiClient.getCompanyBySlug(slug)
+            if (vaspCompany?.sector_details) {
+              setSectorSpecificData(vaspCompany.sector_details)
+            }
+          } catch (err) {
+            console.log('No sector-specific data found:', err)
+          }
+        }
         
         // Fetch user notes from Supabase
         if (companyData) {
@@ -106,38 +123,68 @@ function CompanyPage() {
     }
   }
 
-  const saveNote = async () => {
+  const addNote = async () => {
     if (!newNote.trim() || !company) return
-
-    if (!supabase) {
-      console.log('Supabase not available, cannot save note')
-      return
-    }
 
     setSavingNote(true)
     try {
+      if (!supabase) {
+        console.log('Supabase not available, cannot save note')
+        return
+      }
+
       const { data, error } = await supabase
         .from('user_notes')
-        .insert([
-          {
-            user_id: MOCK_USER_ID,
-            company_id: company.id,
-            note_text: newNote.trim()
-          }
-        ])
+        .insert({
+          user_id: MOCK_USER_ID,
+          company_id: company.id,
+          note_text: newNote.trim()
+        })
         .select()
+        .single()
 
       if (error) throw error
-      
-      if (data && data[0]) {
-        setNotes([data[0], ...notes])
-        setNewNote('')
-      }
-    } catch (err) {
-      console.error('Error saving note:', err)
-      alert('Failed to save note. Please try again.')
+
+      setNotes(prev => [data, ...prev])
+      setNewNote('')
+    } catch (error) {
+      console.error('Error saving note:', error)
     } finally {
       setSavingNote(false)
+    }
+  }
+
+  const handleSectorDataChange = (sectorSlug: string, field: string, value: any) => {
+    setSectorSpecificData((prev: any) => ({
+      ...prev,
+      [sectorSlug]: {
+        ...prev[sectorSlug],
+        [field]: value
+      }
+    }))
+  }
+
+  const saveSectorSpecificData = async () => {
+    if (!company) return
+
+    setSaving(true)
+    try {
+      // Save sector-specific data for each sector
+      for (const sectorSlug of company.sectors || []) {
+        const sectorData = sectorSpecificData[sectorSlug]
+        if (sectorData && Object.keys(sectorData).length > 0) {
+          // In a real implementation, you would call the appropriate API endpoint
+          // based on the sector type to save the sector-specific data
+          console.log(`Saving ${sectorSlug} data for company ${company.id}:`, sectorData)
+        }
+      }
+
+      setIsEditing(false)
+      // Show success message or refresh data
+    } catch (err) {
+      console.error('Error saving sector data:', err)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -405,6 +452,90 @@ function CompanyPage() {
               )}
             </div>
 
+            {/* Sector-Specific Details Section */}
+            {company.sectors && company.sectors.length > 0 && unifiedApiClient.hasVASPFeatures() && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900">Sector-Specific Details</h2>
+                  <button
+                    onClick={() => setIsEditing(!isEditing)}
+                    className="flex items-center px-3 py-1 text-sm text-indigo-600 hover:text-indigo-700 border border-indigo-600 rounded-md hover:bg-indigo-50"
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    {isEditing ? 'Cancel' : 'Edit'}
+                  </button>
+                </div>
+
+                {isEditing ? (
+                  <div className="space-y-6">
+                    <SectorSpecificSections
+                      selectedSectors={company.sectors}
+                      data={sectorSpecificData}
+                      onChange={handleSectorDataChange}
+                    />
+                    <div className="flex justify-end space-x-3">
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={saveSectorSpecificData}
+                        disabled={saving}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 flex items-center"
+                      >
+                        {saving ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        ) : (
+                          <Edit className="h-4 w-4 mr-2" />
+                        )}
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {company.sectors.map((sectorSlug: string) => {
+                      const sectorData = sectorSpecificData[sectorSlug]
+                      if (!sectorData || Object.keys(sectorData).length === 0) {
+                        return (
+                          <div key={sectorSlug} className="p-4 bg-gray-50 rounded-lg">
+                            <h3 className="font-medium text-gray-900 mb-2 capitalize">
+                              {sectorSlug.replace('-', ' ')} Details
+                            </h3>
+                            <p className="text-gray-500 text-sm">
+                              No sector-specific details available. Click "Edit" to add information.
+                            </p>
+                          </div>
+                        )
+                      }
+
+                      return (
+                        <div key={sectorSlug} className="p-4 bg-gray-50 rounded-lg">
+                          <h3 className="font-medium text-gray-900 mb-3 capitalize">
+                            {sectorSlug.replace('-', ' ')} Details
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {Object.entries(sectorData).map(([key, value]) => (
+                              <div key={key} className="flex justify-between">
+                                <span className="text-gray-500 capitalize">
+                                  {key.replace(/_/g, ' ')}:
+                                </span>
+                                <span className="text-gray-900">
+                                  {Array.isArray(value) ? value.join(', ') : String(value)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Research Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-6">Research & Analysis</h2>
@@ -438,7 +569,7 @@ function CompanyPage() {
                   rows={4}
                 />
                 <button
-                  onClick={saveNote}
+                  onClick={addNote}
                   disabled={!newNote.trim() || savingNote}
                   className="mt-3 w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
