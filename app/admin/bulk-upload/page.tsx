@@ -168,8 +168,8 @@ export default function BulkUploadPage() {
             company_overview: company.company_overview || '',
             secp_registration_number: company.secp_registration_number || '',
             pvara_license_number: company.pvara_license_number || '',
-            license_status: (company.license_status || 'None') as 'None' | 'Applied' | 'Granted' | 'Suspended' | 'Under Review',
-            verification_status: (company.verification_status || 'Pending') as 'Pending' | 'Verified' | 'Rejected' | 'Under Review',
+            license_status: (['Applied', 'Granted', 'Suspended', 'None', 'Under Review'].includes(company.license_status || '') ? (company.license_status || 'None') : 'None') as 'None' | 'Applied' | 'Granted' | 'Suspended' | 'Under Review',
+            verification_status: (['Pending', 'Verified', 'Rejected', 'Under Review'].includes(company.verification_status || '') ? (company.verification_status || 'Pending') : 'Pending') as 'Pending' | 'Verified' | 'Rejected' | 'Under Review',
             last_updated_by: 'admin@pakistancrypto.council'
           }
 

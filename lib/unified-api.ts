@@ -73,7 +73,7 @@ class UnifiedApiClient {
             name: company.name,
             slug: company.slug,
             logo_url: company.logo_url,
-            short_summary: company.company_description.substring(0, 100) + '...',
+            short_summary: (company.company_description || company.name).substring(0, 100) + '...',
             website: company.website
           }))
         }
@@ -98,7 +98,7 @@ class UnifiedApiClient {
           name: company.name,
           slug: company.slug,
           logo_url: company.logo_url,
-          short_summary: company.company_description.substring(0, 200) + '...',
+          short_summary: (company.company_description || company.name).substring(0, 200) + '...',
           website: company.website,
           sector_name: company.category?.name || '',
           // Enhanced VASP-specific data
