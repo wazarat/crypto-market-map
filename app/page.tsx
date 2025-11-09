@@ -59,14 +59,20 @@ export default function HomePage() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">Crypto Market Map</h1>
-            </div>
             <div className="flex items-center space-x-4">
-              <TrendingUp className="h-5 w-5 text-gray-400" />
-              <span className="text-sm text-gray-600">Industry Overview</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">PC</span>
+                </div>
+                <span className="font-semibold text-gray-900">Pakistan Crypto Council</span>
+              </div>
             </div>
+            <nav className="hidden md:flex space-x-8">
+              <a href="#" className="text-gray-600 hover:text-gray-900">Companies</a>
+              <a href="#" className="text-gray-600 hover:text-gray-900">Research</a>
+              <a href="#" className="text-gray-600 hover:text-gray-900">About</a>
+              <a href="/admin" className="text-indigo-600 hover:text-indigo-700 font-medium">Admin</a>
+            </nav>
           </div>
         </div>
       </header>

@@ -6,9 +6,10 @@ import { useState, useEffect } from 'react'
 export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2, Edit } from 'lucide-react'
 import { apiClient, CompanyDetail, ResearchEntry } from '../../../lib/api'
 import { supabase, UserNote } from '../../../lib/supabase'
+import ChatbaseWidget from '../../../components/ChatbaseWidget'
 
 // Mock user ID - replace with real auth later
 const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4-a716-446655440000'
@@ -158,43 +159,44 @@ export default function CompanyPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between py-6">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 mr-4">
-                <ArrowLeft className="h-5 w-5 mr-1" />
-                Back
+              <Link
+                href="/"
+                className="mr-4 p-2 text-gray-500 hover:text-gray-700 rounded-md"
+              >
+                <ArrowLeft className="h-5 w-5" />
               </Link>
-              <div className="flex items-center">
-                {company.logo_url && (
-                  <img 
-                    src={company.logo_url} 
-                    alt={company.name} 
-                    className="w-10 h-10 rounded-lg mr-3"
-                  />
-                )}
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">{company.name}</h1>
-                  <p className="text-sm text-gray-600">{company.sector_name}</p>
-                </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
+                <p className="text-gray-600">{company.sector_name}</p>
               </div>
             </div>
-            {company.website && (
-              <a
-                href={company.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center text-sm text-gray-600 hover:text-gray-900"
+            <div className="flex items-center space-x-3">
+              <Link
+                href={`/admin/company/${slug}/edit`}
+                className="inline-flex items-center px-4 py-2 border border-indigo-300 rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100"
               >
-                <Globe className="h-4 w-4 mr-1" />
-                Visit Website
-                <ExternalLink className="h-3 w-3 ml-1" />
-              </a>
-            )}
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Company
+              </Link>
+              {company.website && (
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Visit Website
+                </a>
+              )}
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -280,6 +282,14 @@ export default function CompanyPage() {
           </div>
         </div>
       </main>
+
+      {/* Chatbase Widget */}
+      {company && (
+        <ChatbaseWidget 
+          companyName={company.name}
+          companyData={company}
+        />
+      )}
     </div>
   )
 }
