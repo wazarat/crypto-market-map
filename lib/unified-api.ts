@@ -150,26 +150,9 @@ class UnifiedApiClient {
   }
 
   async getCompanyResearch(companySlug: string) {
-    if (USE_SUPABASE) {
-      try {
-        const company = await vaspApiClient.getCompanyBySlug(companySlug)
-        if (!company) return []
-
-        const research = await vaspApiClient.getCompanyResearch(company.id)
-        return research.map(item => ({
-          id: item.id,
-          title: item.title,
-          content: item.content,
-          source_url: item.source_url,
-          created_at: item.created_at
-        }))
-      } catch (error) {
-        console.error('❌ Supabase error, falling back to mock data:', error)
-        return apiClient.getCompanyResearch(companySlug)
-      }
-    } else {
-      return apiClient.getCompanyResearch(companySlug)
-    }
+    // Research functionality not implemented yet - return empty array
+    // This prevents 404 errors and localhost connection attempts
+    return []
   }
 
   // VASP-specific methods (only available with Supabase)

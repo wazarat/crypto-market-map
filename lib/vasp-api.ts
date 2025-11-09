@@ -108,12 +108,19 @@ class VASPApiClient {
     try {
       switch (categorySlug) {
         case 'advisory-services':
-          const { data: advisoryData } = await client
-            .from('advisory_services_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = advisoryData
+          try {
+            const { data: advisoryData, error } = await client
+              .from('advisory_services_details')
+              .select('*')
+              .eq('company_id', company.id)
+              .single()
+            if (!error) {
+              sectorDetails = advisoryData
+            }
+          } catch (err) {
+            console.log('No advisory services details found for company:', company.id)
+            sectorDetails = null
+          }
           break
 
         case 'broker-dealer-services':
@@ -126,21 +133,35 @@ class VASPApiClient {
           break
 
         case 'custody-services':
-          const { data: custodyData } = await client
-            .from('custody_services_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = custodyData
+          try {
+            const { data: custodyData, error } = await client
+              .from('custody_services_details')
+              .select('*')
+              .eq('company_id', company.id)
+              .single()
+            if (!error) {
+              sectorDetails = custodyData
+            }
+          } catch (err) {
+            console.log('No custody services details found for company:', company.id)
+            sectorDetails = null
+          }
           break
 
         case 'exchange-services':
-          const { data: exchangeData } = await client
-            .from('exchange_services_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = exchangeData
+          try {
+            const { data: exchangeData, error } = await client
+              .from('exchange_services_details')
+              .select('*')
+              .eq('company_id', company.id)
+              .single()
+            if (!error) {
+              sectorDetails = exchangeData
+            }
+          } catch (err) {
+            console.log('No exchange services details found for company:', company.id)
+            sectorDetails = null
+          }
           break
 
         case 'lending-borrowing':
