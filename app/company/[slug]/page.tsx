@@ -7,7 +7,8 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2, Edit } from 'lucide-react'
-import { apiClient, CompanyDetail, ResearchEntry } from '../../../lib/api'
+import { unifiedApiClient } from '../../../lib/unified-api'
+import { CompanyDetail, ResearchEntry } from '../../../lib/api'
 import { supabase, UserNote } from '../../../lib/supabase'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
 import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
@@ -32,15 +33,17 @@ export default function CompanyPage() {
     const fetchCompanyData = async () => {
       try {
         const [companyData, researchData] = await Promise.all([
-          apiClient.getCompany(slug),
-          apiClient.getCompanyResearch(slug)
+          unifiedApiClient.getCompanyDetail(slug),
+          unifiedApiClient.getCompanyResearch ? unifiedApiClient.getCompanyResearch(slug) : []
         ])
         
-        setCompany(companyData)
-        setResearch(researchData)
+        setCompany(companyData as CompanyDetail)
+        setResearch(researchData as ResearchEntry[])
         
         // Fetch user notes from Supabase
-        await fetchNotes(companyData.id)
+        if (companyData) {
+          await fetchNotes(companyData.id)
+        }
       } catch (err) {
         setError('Failed to load company data')
         console.error('Error fetching company data:', err)

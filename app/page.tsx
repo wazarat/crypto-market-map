@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ExternalLink, Building2, TrendingUp } from 'lucide-react'
-import { apiClient, Sector } from '../lib/api'
+import { unifiedApiClient } from '../lib/unified-api'
+import { Sector } from '../lib/api'
 
 export default function HomePage() {
   const [sectors, setSectors] = useState<Sector[]>([])
@@ -13,8 +14,8 @@ export default function HomePage() {
   useEffect(() => {
     const fetchSectors = async () => {
       try {
-        const data = await apiClient.getSectors()
-        setSectors(data)
+        const data = await unifiedApiClient.getSectors()
+        setSectors(data as Sector[])
       } catch (err) {
         setError('Failed to load sectors')
         console.error('Error fetching sectors:', err)

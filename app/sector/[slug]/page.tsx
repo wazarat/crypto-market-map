@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Building2, Globe } from 'lucide-react'
-import { apiClient, Sector } from '../../../lib/api'
+import { unifiedApiClient } from '../../../lib/unified-api'
+import { Sector } from '../../../lib/api'
 
 export default function SectorPage() {
   const params = useParams()
@@ -17,8 +18,8 @@ export default function SectorPage() {
   useEffect(() => {
     const fetchSector = async () => {
       try {
-        const data = await apiClient.getSector(slug)
-        setSector(data)
+        const data = await unifiedApiClient.getSector(slug)
+        setSector(data as Sector)
       } catch (err) {
         setError('Failed to load sector')
         console.error('Error fetching sector:', err)
