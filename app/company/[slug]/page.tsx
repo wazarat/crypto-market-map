@@ -10,6 +10,8 @@ import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2, Edit
 import { apiClient, CompanyDetail, ResearchEntry } from '../../../lib/api'
 import { supabase, UserNote } from '../../../lib/supabase'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
+import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
+import EnvDebug from '../../../components/EnvDebug'
 
 // Mock user ID - replace with real auth later
 const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4-a716-446655440000'
@@ -158,6 +160,7 @@ export default function CompanyPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <EnvDebug />
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -283,12 +286,18 @@ export default function CompanyPage() {
         </div>
       </main>
 
-      {/* Chatbase Widget */}
+      {/* Chatbase Widget - Testing both implementations */}
       {company && (
-        <ChatbaseWidget 
-          companyName={company.name}
-          companyData={company}
-        />
+        <>
+          <ChatbaseWidget 
+            companyName={company.name}
+            companyData={company}
+          />
+          <ChatbaseWidgetAlternative 
+            companyName={company.name}
+            companyData={company}
+          />
+        </>
       )}
     </div>
   )
