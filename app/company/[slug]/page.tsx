@@ -13,6 +13,7 @@ import { supabase, UserNote } from '../../../lib/supabase'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
 import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
 import ChatbaseWidgetSimple from '../../../components/ChatbaseWidgetSimple'
+import ChatbaseWidgetForced from '../../../components/ChatbaseWidgetForced'
 import EnvDebug from '../../../components/EnvDebug'
 
 // Mock user ID - replace with real auth later
@@ -441,6 +442,10 @@ export default function CompanyPage() {
       {/* Chatbase Widget - Testing multiple implementations */}
       {company && (
         <>
+          <ChatbaseWidgetForced 
+            companyName={company.name}
+            companyData={company}
+          />
           <ChatbaseWidgetSimple 
             companyName={company.name}
             companyData={company}
