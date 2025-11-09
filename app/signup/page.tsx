@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Eye, EyeOff, Lock, User, Mail, Building2, Briefcase, Phone, CheckCircle } from 'lucide-react'
-import { authService, SignupData } from '../../lib/auth'
+import { useSupabaseAuth } from '../../lib/supabase-auth-context'
 
 export default function SignupPage() {
-  const [formData, setFormData] = useState<SignupData>({
+  const [formData, setFormData] = useState({
     email: '',
-    username: '',
     password: '',
     full_name: '',
     company_name: '',
@@ -21,6 +20,8 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  
+  const { signUp } = useSupabaseAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,7 +43,7 @@ export default function SignupPage() {
     }
 
     try {
-      const result = await authService.signup(formData)
+      const result = await signUp(formData)
       
       if (result.success) {
         setSuccess(true)
@@ -173,27 +174,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Username */}
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                Username *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Choose a username"
-                />
-              </div>
-            </div>
 
             {/* Company Name */}
             <div>
