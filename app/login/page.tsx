@@ -14,8 +14,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resetLoading, setResetLoading] = useState(false)
+  const [resetMessage, setResetMessage] = useState('')
 
-  const { signIn, isAuthenticated } = useSupabaseAuth()
+  const { signIn, resetPassword, isAuthenticated } = useSupabaseAuth()
   const router = useRouter()
 
   // Redirect if already authenticated
@@ -52,6 +54,30 @@ export default function LoginPage() {
     }))
   }
 
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      setError('Please enter your email address first')
+      return
+    }
+
+    setResetLoading(true)
+    setError('')
+    setResetMessage('')
+
+    try {
+      const result = await resetPassword(formData.email)
+      if (result.success) {
+        setResetMessage(result.message)
+      } else {
+        setError(result.message)
+      }
+    } catch (error) {
+      setError('Failed to send reset email')
+    } finally {
+      setResetLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -76,6 +102,12 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4">
                 <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            {resetMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                <p className="text-sm text-green-600">{resetMessage}</p>
               </div>
             )}
 
@@ -132,6 +164,18 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={resetLoading}
+                className="text-sm text-indigo-600 hover:text-indigo-500 disabled:opacity-50"
+              >
+                {resetLoading ? 'Sending...' : 'Forgot your password?'}
+              </button>
             </div>
 
             {/* Submit Button */}

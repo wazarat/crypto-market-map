@@ -32,6 +32,25 @@ class SupabaseAuthService {
     }
     return supabase
   }
+  // Password reset
+  async resetPassword(email: string) {
+    try {
+      const client = this.ensureSupabase()
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+
+      if (error) {
+        return { success: false, message: error.message }
+      }
+
+      return { success: true, message: 'Password reset email sent. Please check your inbox.' }
+    } catch (error) {
+      console.error('Password reset error:', error)
+      return { success: false, message: 'Failed to send password reset email' }
+    }
+  }
+
   // Sign up new user (will be pending approval)
   async signUp(userData: SignupData) {
     try {

@@ -12,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ success: boolean; message: string }>
   signUp: (userData: any) => Promise<{ success: boolean; message: string }>
   signOut: () => Promise<void>
+  resetPassword: (email: string) => Promise<{ success: boolean; message: string }>
   isAuthenticated: boolean
   isAdmin: boolean
   isApproved: boolean
@@ -109,6 +110,16 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   }
 
+  const resetPassword = async (email: string) => {
+    try {
+      const result = await supabaseAuth.resetPassword(email)
+      return { success: result.success, message: result.message }
+    } catch (error) {
+      console.error('Reset password error:', error)
+      return { success: false, message: 'An error occurred during password reset' }
+    }
+  }
+
   const value: AuthContextType = {
     user,
     profile,
@@ -117,6 +128,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     signIn,
     signUp,
     signOut,
+    resetPassword,
     isAuthenticated: !!user && !!profile && profile.status === 'approved',
     isAdmin: profile?.is_admin || false,
     isApproved: profile?.status === 'approved'
