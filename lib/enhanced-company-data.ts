@@ -6,6 +6,7 @@ export interface BaseCompany {
   name: string
   slug: string
   category_id: string
+  sectors: string[] // Multiple sectors support
   
   // Company Details
   year_founded: number | null
@@ -15,22 +16,29 @@ export interface BaseCompany {
   website: string | null
   contact_email: string | null
   contact_phone: string | null
+  point_of_contact_email: string | null
+  point_of_contact_phone: string | null
   employee_count: number | null
   total_funding_pkr: number | null
   
   // Business Information
   key_partnerships: string[]
   company_description: string
+  company_overview: string | null
   logo_url: string | null
   
   // Social Media
   twitter_handle: string | null
   linkedin_url: string | null
+  social_media_twitter: string | null
+  social_media_linkedin: string | null
+  social_media_facebook: string | null
   
   // Regulatory Information (Pakistan Specific)
   secp_registration_number: string | null
   pvara_license_number: string | null
   license_status: 'Applied' | 'Granted' | 'Suspended' | 'None' | 'Under Review'
+  verification_status: 'Pending' | 'Verified' | 'Rejected' | 'Under Review'
   paid_up_capital_pkr: number | null
   capital_adequacy_ratio: number | null
   number_of_directors: number | null
@@ -45,6 +53,9 @@ export interface BaseCompany {
   market_share_estimate: string | null
   user_base_estimate: string | null
   regulatory_compliance_status: string
+  
+  // Audit fields
+  last_updated_by: string | null
   
   created_at: string
   updated_at: string
@@ -138,6 +149,7 @@ export const enhancedCompanyData: BaseCompany[] = [
     name: 'Tez Financial Services',
     slug: 'tez-financial',
     category_id: '8', // Transfer and Settlement
+    sectors: ['transfer-settlement'],
     year_founded: 2016,
     founder_ceo_name: 'Telenor Pakistan',
     headquarters_location: 'Islamabad, Pakistan',
@@ -145,16 +157,23 @@ export const enhancedCompanyData: BaseCompany[] = [
     website: 'https://www.telenor.com.pk/tez',
     contact_email: 'support@tez.pk',
     contact_phone: '+92-345-0000000',
+    point_of_contact_email: 'business@tez.pk',
+    point_of_contact_phone: '+92-51-111-345-100',
     employee_count: 150,
     total_funding_pkr: 2500000000, // 2.5 billion PKR
     key_partnerships: ['Telenor Pakistan', 'State Bank of Pakistan', 'Various Banks'],
     company_description: 'Leading mobile financial services provider in Pakistan offering digital payments and remittance services.',
+    company_overview: 'Tez Financial Services is Pakistan\'s leading mobile financial services provider, offering comprehensive digital payment solutions including P2P transfers, bill payments, merchant payments, and international remittances through a secure mobile wallet platform.',
     logo_url: null,
     twitter_handle: '@TezPakistan',
     linkedin_url: 'https://linkedin.com/company/tez-pakistan',
+    social_media_twitter: '@TezPakistan',
+    social_media_linkedin: 'https://linkedin.com/company/tez-pakistan',
+    social_media_facebook: 'https://facebook.com/TezPakistan',
     secp_registration_number: 'SECP-2016-001',
     pvara_license_number: null,
     license_status: 'Applied',
+    verification_status: 'Under Review',
     paid_up_capital_pkr: 1000000000,
     capital_adequacy_ratio: 15.5,
     number_of_directors: 7,
@@ -167,6 +186,7 @@ export const enhancedCompanyData: BaseCompany[] = [
     market_share_estimate: '25% of digital payments market in Pakistan',
     user_base_estimate: '10 million active users',
     regulatory_compliance_status: 'Fully compliant with SBP regulations, applying for PVARA license',
+    last_updated_by: 'admin@pakistancrypto.council',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-11-08T00:00:00Z'
   }
