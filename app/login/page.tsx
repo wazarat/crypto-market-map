@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Lock, User, Building2 } from 'lucide-react'
-import { useSupabaseAuth } from '../../lib/supabase-auth-context'
+import { useSimpleAuth } from '../../lib/simple-auth-context'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [resetLoading, setResetLoading] = useState(false)
   const [resetMessage, setResetMessage] = useState('')
 
-  const { signIn, resetPassword, isAuthenticated } = useSupabaseAuth()
+  const { signIn, isAuthenticated } = useSimpleAuth()
   const router = useRouter()
 
   // Redirect if already authenticated
@@ -55,27 +55,7 @@ export default function LoginPage() {
   }
 
   const handleForgotPassword = async () => {
-    if (!formData.email) {
-      setError('Please enter your email address first')
-      return
-    }
-
-    setResetLoading(true)
-    setError('')
-    setResetMessage('')
-
-    try {
-      const result = await resetPassword(formData.email)
-      if (result.success) {
-        setResetMessage(result.message)
-      } else {
-        setError(result.message)
-      }
-    } catch (error) {
-      setError('Failed to send reset email')
-    } finally {
-      setResetLoading(false)
-    }
+    setError('Password reset feature coming soon. Please contact admin for password reset.')
   }
 
   return (
