@@ -8,7 +8,7 @@ import { apiClient, Sector } from '../../../lib/api'
 
 export default function SectorPage() {
   const params = useParams()
-  const slug = params.slug as string
+  const slug = params?.slug as string
   
   const [sector, setSector] = useState<Sector | null>(null)
   const [loading, setLoading] = useState(true)
