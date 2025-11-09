@@ -142,7 +142,7 @@ class VASPApiClient {
             if (!error) {
               sectorDetails = custodyData
             }
-          } catch (err) {
+                     } catch (err) {
             console.log('No custody services details found for company:', company.id)
             sectorDetails = null
           }

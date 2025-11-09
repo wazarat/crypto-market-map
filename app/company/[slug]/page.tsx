@@ -17,6 +17,8 @@ import ChatbaseWidgetForced from '../../../components/ChatbaseWidgetForced'
 import ChatbaseWidgetOfficial from '../../../components/ChatbaseWidgetOfficial'
 import EnvDebug from '../../../components/EnvDebug'
 import { chatbaseIdentity } from '../../../lib/chatbase-identity'
+import { chatbaseContext } from '../../../lib/chatbase-context'
+import ChatbaseDebugger from '../../../components/ChatbaseDebugger'
 
 // Mock user ID - replace with real auth later
 const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4-a716-446655440000'
@@ -51,7 +53,10 @@ export default function CompanyPage() {
           // Set up Chatbase identity for personalized responses
           const demoUser = chatbaseIdentity.setupDemoUser()
           
-          // Wait a bit for Chatbase to load, then identify user
+          // Set company context for Chatbase immediately
+          chatbaseContext.setCompanyContext(companyData, companyData.name)
+          
+          // Wait a bit for Chatbase to load, then identify user and refresh context
           setTimeout(() => {
             const company = companyData as any
             chatbaseIdentity.identifyWithChatbase({
@@ -61,6 +66,9 @@ export default function CompanyPage() {
               license_status: company.license_status,
               verification_status: company.verification_status
             })
+            
+            // Refresh context to ensure it's set
+            chatbaseContext.refreshContext()
           }, 3000)
         }
       } catch (err) {
@@ -183,6 +191,7 @@ export default function CompanyPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <EnvDebug />
+      <ChatbaseDebugger />
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
