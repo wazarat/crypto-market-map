@@ -40,7 +40,7 @@ interface CompanyFormData {
 export default function EditCompanyPage() {
   const params = useParams()
   const router = useRouter()
-  const slug = params.slug as string
+  const slug = params?.slug as string
 
   const [company, setCompany] = useState<any>(null)
   const [sectorSpecificData, setSectorSpecificData] = useState<any>({})
