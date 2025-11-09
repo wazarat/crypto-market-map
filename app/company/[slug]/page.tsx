@@ -18,7 +18,7 @@ const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4
 
 export default function CompanyPage() {
   const params = useParams()
-  const slug = params.slug as string
+  const slug = params?.slug as string
   
   const [company, setCompany] = useState<CompanyDetail | null>(null)
   const [research, setResearch] = useState<ResearchEntry[]>([])
