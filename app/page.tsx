@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { ExternalLink, Building2, TrendingUp, LogOut, User } from 'lucide-react'
 import { unifiedApiClient } from '../lib/unified-api'
 import { Sector } from '../lib/api'
-import { useAuth } from '../lib/auth-context'
+import { useSupabaseAuth } from '../lib/supabase-auth-context'
 
 export default function HomePage() {
   const [sectors, setSectors] = useState<Sector[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
-  const { user, isAuthenticated, isAdmin, logout } = useAuth()
+  const { profile, isAuthenticated, isAdmin, signOut } = useSupabaseAuth()
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -89,10 +89,10 @@ export default function HomePage() {
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                       <User className="h-4 w-4" />
-                      <span>{user?.full_name}</span>
+                      <span>{profile?.full_name}</span>
                     </div>
                     <button
-                      onClick={logout}
+                      onClick={signOut}
                       className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-900"
                     >
                       <LogOut className="h-4 w-4" />
@@ -144,7 +144,7 @@ export default function HomePage() {
 }
 
 function SectorCard({ sector }: { sector: Sector }) {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated } = useSupabaseAuth()
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200 transition-all duration-200">
       <div className="flex items-center justify-between mb-4">

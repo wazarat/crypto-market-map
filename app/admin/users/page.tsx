@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { Check, X, Clock, User, Building2, Mail, Phone, Calendar } from 'lucide-react'
-import { authService, User as UserType } from '../../../lib/auth'
-import { useAuth, withAuth } from '../../../lib/auth-context'
+import { supabaseAuth, UserProfile } from '../../../lib/supabase-auth'
+import { useSupabaseAuth, withSupabaseAuth } from '../../../lib/supabase-auth-context'
 
 function AdminUsersPage() {
-  const [pendingUsers, setPendingUsers] = useState<UserType[]>([])
+  const [pendingUsers, setPendingUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const { user } = useAuth()
+  const { user } = useSupabaseAuth()
 
   useEffect(() => {
     fetchPendingUsers()
@@ -21,7 +21,7 @@ function AdminUsersPage() {
   const fetchPendingUsers = async () => {
     try {
       setLoading(true)
-      const users = await authService.getPendingUsers()
+      const users = await supabaseAuth.getPendingUsers()
       setPendingUsers(users)
     } catch (error) {
       setError('Failed to fetch pending users')
@@ -39,7 +39,7 @@ function AdminUsersPage() {
       setError('')
       setSuccess('')
 
-      const result = await authService.approveUser(userId, user.id)
+      const result = await supabaseAuth.approveUser(userId, user.id)
       
       if (result.success) {
         setSuccess('User approved successfully')
@@ -64,7 +64,7 @@ function AdminUsersPage() {
       setError('')
       setSuccess('')
 
-      const result = await authService.rejectUser(userId, user.id, reason)
+      const result = await supabaseAuth.rejectUser(userId, user.id, reason)
       
       if (result.success) {
         setSuccess('User rejected successfully')
@@ -172,7 +172,7 @@ function UserCard({
   onReject, 
   loading 
 }: { 
-  user: UserType
+  user: UserProfile
   onApprove: () => void
   onReject: (reason?: string) => void
   loading: boolean
@@ -198,7 +198,7 @@ function UserCard({
               </div>
               <div>
                 <h3 className="text-lg font-medium text-gray-900">{user.full_name}</h3>
-                <p className="text-sm text-gray-500">@{user.username}</p>
+                <p className="text-sm text-gray-500">{user.email}</p>
               </div>
             </div>
 
@@ -312,4 +312,4 @@ function UserCard({
   )
 }
 
-export default withAuth(AdminUsersPage, { requireAdmin: true })
+export default withSupabaseAuth(AdminUsersPage, { requireAdmin: true })
