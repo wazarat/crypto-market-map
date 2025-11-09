@@ -19,11 +19,12 @@ import EnvDebug from '../../../components/EnvDebug'
 import { chatbaseIdentity } from '../../../lib/chatbase-identity'
 import { chatbaseContext } from '../../../lib/chatbase-context'
 import ChatbaseDebugger from '../../../components/ChatbaseDebugger'
+import { withAuth } from '../../../lib/auth-context'
 
 // Mock user ID - replace with real auth later
 const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4-a716-446655440000'
 
-export default function CompanyPage() {
+function CompanyPage() {
   const params = useParams()
   const slug = params?.slug as string
   
@@ -534,3 +535,6 @@ function NoteCard({ note, onDelete }: { note: UserNote; onDelete: (id: string) =
     </div>
   )
 }
+
+// Export with authentication protection
+export default withAuth(CompanyPage)

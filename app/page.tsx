@@ -2,14 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ExternalLink, Building2, TrendingUp } from 'lucide-react'
+import { ExternalLink, Building2, TrendingUp, LogOut, User } from 'lucide-react'
 import { unifiedApiClient } from '../lib/unified-api'
 import { Sector } from '../lib/api'
+import { useAuth } from '../lib/auth-context'
 
 export default function HomePage() {
   const [sectors, setSectors] = useState<Sector[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  const { user, isAuthenticated, isAdmin, logout } = useAuth()
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -68,12 +71,52 @@ export default function HomePage() {
                 <span className="font-semibold text-gray-900">Pakistan Crypto Council</span>
               </div>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-600 hover:text-gray-900">Companies</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">Research</a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">About</a>
-              <a href="/admin" className="text-indigo-600 hover:text-indigo-700 font-medium">Admin</a>
-            </nav>
+            <div className="flex items-center space-x-6">
+              <nav className="hidden md:flex space-x-8">
+                <a href="#" className="text-gray-600 hover:text-gray-900">Companies</a>
+                <a href="#" className="text-gray-600 hover:text-gray-900">Research</a>
+                <a href="#" className="text-gray-600 hover:text-gray-900">About</a>
+                {isAdmin && (
+                  <Link href="/admin" className="text-indigo-600 hover:text-indigo-700 font-medium">
+                    Admin
+                  </Link>
+                )}
+              </nav>
+              
+              {/* Authentication Section */}
+              <div className="flex items-center space-x-4">
+                {isAuthenticated ? (
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <User className="h-4 w-4" />
+                      <span>{user?.full_name}</span>
+                    </div>
+                    <button
+                      onClick={logout}
+                      className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-3">
+                    <Link
+                      href="/login"
+                      className="text-sm text-gray-600 hover:text-gray-900"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="text-sm bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -101,6 +144,7 @@ export default function HomePage() {
 }
 
 function SectorCard({ sector }: { sector: Sector }) {
+  const { isAuthenticated } = useAuth()
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200 transition-all duration-200">
       <div className="flex items-center justify-between mb-4">
@@ -117,20 +161,37 @@ function SectorCard({ sector }: { sector: Sector }) {
       {/* Company Pills */}
       <div className="flex flex-wrap gap-2 mb-4">
         {sector.companies.slice(0, 6).map((company) => (
-          <Link
-            key={company.id}
-            href={`/company/${company.slug}`}
-            className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
-          >
-            {company.logo_url && (
-              <img 
-                src={company.logo_url} 
-                alt={company.name} 
-                className="w-4 h-4 rounded-full mr-1"
-              />
-            )}
-            {company.name}
-          </Link>
+          isAuthenticated ? (
+            <Link
+              key={company.id}
+              href={`/company/${company.slug}`}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+            >
+              {company.logo_url && (
+                <img 
+                  src={company.logo_url} 
+                  alt={company.name} 
+                  className="w-4 h-4 rounded-full mr-1"
+                />
+              )}
+              {company.name}
+            </Link>
+          ) : (
+            <span
+              key={company.id}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500 cursor-not-allowed"
+              title="Login required to view company details"
+            >
+              {company.logo_url && (
+                <img 
+                  src={company.logo_url} 
+                  alt={company.name} 
+                  className="w-4 h-4 rounded-full mr-1 opacity-50"
+                />
+              )}
+              {company.name}
+            </span>
+          )
         ))}
         {sector.companies.length > 6 && (
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
@@ -140,13 +201,23 @@ function SectorCard({ sector }: { sector: Sector }) {
       </div>
 
       {/* View All Button */}
-      <Link
-        href={`/sector/${sector.slug}`}
-        className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700"
-      >
-        View all companies
-        <ExternalLink className="ml-1 h-4 w-4" />
-      </Link>
+      {isAuthenticated ? (
+        <Link
+          href={`/sector/${sector.slug}`}
+          className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700"
+        >
+          View all companies
+          <ExternalLink className="ml-1 h-4 w-4" />
+        </Link>
+      ) : (
+        <Link
+          href="/login"
+          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600"
+        >
+          Login to view companies
+          <ExternalLink className="ml-1 h-4 w-4" />
+        </Link>
+      )}
     </div>
   )
 }
