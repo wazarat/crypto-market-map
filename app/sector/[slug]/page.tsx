@@ -123,7 +123,13 @@ function CompanyCard({ company }: { company: any }) {
               {company.website && (
                 <div className="flex items-center text-sm text-gray-500 mt-1">
                   <Globe className="h-3 w-3 mr-1" />
-                  <span>{new URL(company.website).hostname}</span>
+                  <span>{(() => {
+                    try {
+                      return new URL(company.website).hostname
+                    } catch {
+                      return company.website
+                    }
+                  })()}</span>
                 </div>
               )}
             </div>
