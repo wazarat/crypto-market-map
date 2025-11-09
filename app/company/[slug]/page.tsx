@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
+// Force dynamic rendering to prevent build-time errors
+export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, ExternalLink, Building2, Globe, Calendar, Plus, Trash2 } from 'lucide-react'
@@ -50,6 +53,11 @@ export default function CompanyPage() {
 
   const fetchNotes = async (companyId: string) => {
     try {
+      if (!supabase) {
+        console.log('Supabase not available, skipping notes fetch')
+        return
+      }
+
       const { data, error } = await supabase
         .from('user_notes')
         .select('*')
@@ -66,6 +74,11 @@ export default function CompanyPage() {
 
   const saveNote = async () => {
     if (!newNote.trim() || !company) return
+
+    if (!supabase) {
+      console.log('Supabase not available, cannot save note')
+      return
+    }
 
     setSavingNote(true)
     try {
@@ -96,6 +109,11 @@ export default function CompanyPage() {
 
   const deleteNote = async (noteId: string) => {
     try {
+      if (!supabase) {
+        console.log('Supabase not available, cannot delete note')
+        return
+      }
+
       const { error } = await supabase
         .from('user_notes')
         .delete()
