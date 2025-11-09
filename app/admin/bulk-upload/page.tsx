@@ -111,6 +111,22 @@ export default function BulkUploadPage() {
         setError('Database connection not available. Please check environment variables or contact administrator.')
         return
       }
+
+      // Get the Exchange Services category UUID
+      let exchangeServicesCategoryId: string
+      try {
+        const categories = await vaspApiClient.getCategories()
+        const exchangeCategory = categories.find(cat => cat.slug === 'exchange-services')
+        if (!exchangeCategory) {
+          throw new Error('Exchange Services category not found')
+        }
+        exchangeServicesCategoryId = exchangeCategory.id
+        console.log('📋 Exchange Services category ID:', exchangeServicesCategoryId)
+      } catch (categoryError) {
+        console.error('❌ Failed to get Exchange Services category:', categoryError)
+        setError('Failed to find Exchange Services category. Please contact administrator.')
+        return
+      }
       
       // Save companies to database
       const savedCompanies = []
@@ -132,7 +148,7 @@ export default function BulkUploadPage() {
             name: company.name,
             slug,
             sectors: ['exchange-services'], // Pre-selected sector
-            category_id: '4', // Exchange Services category ID
+            category_id: exchangeServicesCategoryId, // Use actual UUID
             pakistan_operations: true,
             year_founded: company.year_founded,
             founder_ceo_name: company.founder_ceo_name || '',
