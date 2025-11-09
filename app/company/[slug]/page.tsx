@@ -14,7 +14,9 @@ import ChatbaseWidget from '../../../components/ChatbaseWidget'
 import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
 import ChatbaseWidgetSimple from '../../../components/ChatbaseWidgetSimple'
 import ChatbaseWidgetForced from '../../../components/ChatbaseWidgetForced'
+import ChatbaseWidgetOfficial from '../../../components/ChatbaseWidgetOfficial'
 import EnvDebug from '../../../components/EnvDebug'
+import { chatbaseIdentity } from '../../../lib/chatbase-identity'
 
 // Mock user ID - replace with real auth later
 const MOCK_USER_ID = process.env.NEXT_PUBLIC_MOCK_USER_ID || '550e8400-e29b-41d4-a716-446655440000'
@@ -45,6 +47,21 @@ export default function CompanyPage() {
         // Fetch user notes from Supabase
         if (companyData) {
           await fetchNotes(companyData.id)
+          
+          // Set up Chatbase identity for personalized responses
+          const demoUser = chatbaseIdentity.setupDemoUser()
+          
+          // Wait a bit for Chatbase to load, then identify user
+          setTimeout(() => {
+            const company = companyData as any
+            chatbaseIdentity.identifyWithChatbase({
+              company: company.name,
+              sector: company.sector_name,
+              website: company.website,
+              license_status: company.license_status,
+              verification_status: company.verification_status
+            })
+          }, 3000)
         }
       } catch (err) {
         setError('Failed to load company data')
@@ -439,26 +456,12 @@ export default function CompanyPage() {
         </div>
       </main>
 
-      {/* Chatbase Widget - Testing multiple implementations */}
+      {/* Chatbase Widget - Official Implementation */}
       {company && (
-        <>
-          <ChatbaseWidgetForced 
-            companyName={company.name}
-            companyData={company}
-          />
-          <ChatbaseWidgetSimple 
-            companyName={company.name}
-            companyData={company}
-          />
-          <ChatbaseWidget 
-            companyName={company.name}
-            companyData={company}
-          />
-          <ChatbaseWidgetAlternative 
-            companyName={company.name}
-            companyData={company}
-          />
-        </>
+        <ChatbaseWidgetOfficial 
+          companyName={company.name}
+          companyData={company}
+        />
       )}
 
       {/* Debug Tools */}
