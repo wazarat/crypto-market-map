@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+
+// Force dynamic rendering to prevent build-time errors
+export const dynamic = 'force-dynamic'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import CompanyForm from '../../../../components/CompanyForm'

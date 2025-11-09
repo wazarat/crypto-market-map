@@ -16,9 +16,18 @@ export interface CompanyFilters {
 }
 
 class VASPApiClient {
+  private ensureSupabase() {
+    if (!supabase) {
+      throw new Error('Supabase client not initialized. Please check environment variables.')
+    }
+    return supabase
+  }
+
   // Get all categories
   async getCategories(): Promise<VASPCategory[]> {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+
+    const { data, error } = await client
       .from('vasp_categories')
       .select('*')
       .order('name')
@@ -29,7 +38,8 @@ class VASPApiClient {
 
   // Get category by slug
   async getCategory(slug: string): Promise<VASPCategory | null> {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+    const { data, error } = await client
       .from('vasp_categories')
       .select('*')
       .eq('slug', slug)
@@ -41,7 +51,8 @@ class VASPApiClient {
 
   // Get companies with filters
   async getCompanies(filters: CompanyFilters = {}): Promise<VASPCompanyWithDetails[]> {
-    let query = supabase
+    const client = this.ensureSupabase()
+    let query = client
       .from('vasp_companies')
       .select(`
         *,
@@ -77,7 +88,8 @@ class VASPApiClient {
 
   // Get company by slug with sector details
   async getCompanyBySlug(slug: string): Promise<VASPCompanyWithDetails | null> {
-    const { data: company, error: companyError } = await supabase
+    const client = this.ensureSupabase()
+    const { data: company, error: companyError } = await client
       .from('vasp_companies')
       .select(`
         *,
@@ -96,7 +108,7 @@ class VASPApiClient {
     try {
       switch (categorySlug) {
         case 'advisory-services':
-          const { data: advisoryData } = await supabase
+          const { data: advisoryData } = await client
             .from('advisory_services_details')
             .select('*')
             .eq('company_id', company.id)
@@ -105,7 +117,7 @@ class VASPApiClient {
           break
 
         case 'broker-dealer-services':
-          const { data: brokerData } = await supabase
+          const { data: brokerData } = await client
             .from('broker_dealer_details')
             .select('*')
             .eq('company_id', company.id)
@@ -114,7 +126,7 @@ class VASPApiClient {
           break
 
         case 'custody-services':
-          const { data: custodyData } = await supabase
+          const { data: custodyData } = await client
             .from('custody_services_details')
             .select('*')
             .eq('company_id', company.id)
@@ -123,7 +135,7 @@ class VASPApiClient {
           break
 
         case 'exchange-services':
-          const { data: exchangeData } = await supabase
+          const { data: exchangeData } = await client
             .from('exchange_services_details')
             .select('*')
             .eq('company_id', company.id)
@@ -132,7 +144,7 @@ class VASPApiClient {
           break
 
         case 'lending-borrowing':
-          const { data: lendingData } = await supabase
+          const { data: lendingData } = await client
             .from('lending_borrowing_details')
             .select('*')
             .eq('company_id', company.id)
@@ -141,7 +153,7 @@ class VASPApiClient {
           break
 
         case 'derivatives':
-          const { data: derivativesData } = await supabase
+          const { data: derivativesData } = await client
             .from('derivatives_details')
             .select('*')
             .eq('company_id', company.id)
@@ -150,7 +162,7 @@ class VASPApiClient {
           break
 
         case 'asset-management':
-          const { data: assetMgmtData } = await supabase
+          const { data: assetMgmtData } = await client
             .from('asset_management_details')
             .select('*')
             .eq('company_id', company.id)
@@ -159,7 +171,7 @@ class VASPApiClient {
           break
 
         case 'transfer-settlement':
-          const { data: transferData } = await supabase
+          const { data: transferData } = await client
             .from('transfer_settlement_details')
             .select('*')
             .eq('company_id', company.id)
@@ -168,7 +180,7 @@ class VASPApiClient {
           break
 
         case 'fiat-tokens':
-          const { data: fiatTokenData } = await supabase
+          const { data: fiatTokenData } = await client
             .from('fiat_referenced_token_details')
             .select('*')
             .eq('company_id', company.id)
@@ -177,7 +189,7 @@ class VASPApiClient {
           break
 
         case 'asset-tokens':
-          const { data: assetTokenData } = await supabase
+          const { data: assetTokenData } = await client
             .from('asset_referenced_token_details')
             .select('*')
             .eq('company_id', company.id)
@@ -198,7 +210,8 @@ class VASPApiClient {
 
   // Get company research
   async getCompanyResearch(companyId: string) {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+    const { data, error } = await client
       .from('company_research')
       .select('*')
       .eq('company_id', companyId)
@@ -210,7 +223,8 @@ class VASPApiClient {
 
   // Get companies by category
   async getCompaniesByCategory(categorySlug: string): Promise<VASPCompanyWithDetails[]> {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+    const { data, error } = await client
       .from('vasp_companies')
       .select(`
         *,
@@ -227,7 +241,8 @@ class VASPApiClient {
 
   // Create company
   async createCompany(companyData: Partial<BaseCompany>): Promise<BaseCompany> {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+    const { data, error } = await client
       .from('vasp_companies')
       .insert(companyData)
       .select()
@@ -239,7 +254,8 @@ class VASPApiClient {
 
   // Update company
   async updateCompany(id: string, updates: Partial<BaseCompany>): Promise<BaseCompany> {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+    const { data, error } = await client
       .from('vasp_companies')
       .update(updates)
       .eq('id', id)
@@ -252,7 +268,8 @@ class VASPApiClient {
 
   // Delete company
   async deleteCompany(id: string): Promise<void> {
-    const { error } = await supabase
+    const client = this.ensureSupabase()
+    const { error } = await client
       .from('vasp_companies')
       .delete()
       .eq('id', id)
@@ -271,7 +288,8 @@ class VASPApiClient {
       updates.pvara_license_number = licenseNumber
     }
 
-    const { error } = await supabase
+    const client = this.ensureSupabase()
+    const { error } = await client
       .from('vasp_companies')
       .update(updates)
       .eq('id', companyId)
@@ -281,7 +299,8 @@ class VASPApiClient {
 
   // Get regulatory compliance summary
   async getRegulatoryComplianceSummary() {
-    const { data, error } = await supabase
+    const client = this.ensureSupabase()
+    const { data, error } = await client
       .from('vasp_companies')
       .select(`
         license_status,
