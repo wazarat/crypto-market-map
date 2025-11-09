@@ -93,10 +93,34 @@ export default function BulkUploadPage() {
         return
       }
 
+      // Check if Supabase is available
+      console.log('🔍 Checking database connection...')
+      
+      // Check environment variables
+      const hasSupabase = Boolean(
+        process.env.NEXT_PUBLIC_SUPABASE_URL && 
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      )
+      console.log('🔧 Environment check:', {
+        hasSupabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+        hasSupabaseKey: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+        hasSupabase
+      })
+
+      if (!hasSupabase) {
+        setError('Database connection not available. Please check environment variables or contact administrator.')
+        return
+      }
+      
       // Save companies to database
       const savedCompanies = []
-      for (const company of companies) {
+      const failedCompanies = []
+      
+      for (let i = 0; i < companies.length; i++) {
+        const company = companies[i]
         try {
+          console.log(`💾 Saving company ${i + 1}/${companies.length}: ${company.name}`)
+          
           // Create slug from company name
           const slug = company.name.toLowerCase()
             .replace(/[^a-z0-9\s-]/g, '')
@@ -105,22 +129,52 @@ export default function BulkUploadPage() {
             .trim()
 
           const companyData = {
-            ...company,
+            name: company.name,
             slug,
             sectors: ['exchange-services'], // Pre-selected sector
             category_id: '4', // Exchange Services category ID
             pakistan_operations: true,
+            year_founded: company.year_founded,
+            founder_ceo_name: company.founder_ceo_name || '',
+            headquarters_location: company.headquarters_location || '',
+            website: company.website || '',
+            contact_email: company.contact_email || '',
+            contact_phone: company.contact_phone || '',
+            point_of_contact_email: company.point_of_contact_email || '',
+            point_of_contact_phone: company.point_of_contact_phone || '',
+            social_media_twitter: company.social_media_twitter || '',
+            social_media_linkedin: company.social_media_linkedin || '',
+            social_media_facebook: company.social_media_facebook || '',
+            employee_count: company.employee_count,
+            total_funding_pkr: company.total_funding_pkr,
+            key_partnerships: company.key_partnerships || [],
+            company_description: company.company_description || '',
+            company_overview: company.company_overview || '',
+            secp_registration_number: company.secp_registration_number || '',
+            pvara_license_number: company.pvara_license_number || '',
             license_status: (company.license_status || 'None') as 'None' | 'Applied' | 'Granted' | 'Suspended' | 'Under Review',
             verification_status: (company.verification_status || 'Pending') as 'Pending' | 'Verified' | 'Rejected' | 'Under Review',
             last_updated_by: 'admin@pakistancrypto.council'
           }
 
+          console.log('📋 Company data prepared:', { name: companyData.name, slug: companyData.slug })
+
           const savedCompany = await vaspApiClient.createCompany(companyData)
           savedCompanies.push(savedCompany)
-        } catch (companyError) {
-          console.error(`Failed to save company ${company.name}:`, companyError)
-          throw new Error(`Failed to save company: ${company.name}`)
+          console.log(`✅ Successfully saved: ${company.name}`)
+          
+        } catch (companyError: any) {
+          console.error(`❌ Failed to save company ${company.name}:`, companyError)
+          failedCompanies.push({
+            name: company.name,
+            error: companyError.message || 'Unknown error'
+          })
         }
+      }
+
+      if (failedCompanies.length > 0) {
+        const failedNames = failedCompanies.map(f => `${f.name} (${f.error})`).join(', ')
+        throw new Error(`Failed to save ${failedCompanies.length} companies: ${failedNames}`)
       }
 
       setSuccess(true)
