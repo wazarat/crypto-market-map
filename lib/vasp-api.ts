@@ -2,6 +2,9 @@
 import { supabase } from './supabase'
 import { BaseCompany, VASPCategory } from './enhanced-company-data'
 
+// Re-export VASPCategory for use in other components
+export type { VASPCategory }
+
 export interface VASPCompanyWithDetails extends BaseCompany {
   category: VASPCategory
   sector_details?: any

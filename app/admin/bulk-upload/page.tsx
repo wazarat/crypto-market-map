@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload, Download, Plus, Trash2, Save } from 'lucide-react'
 import CSVImport from '../../../components/CSVImport'
-import { vaspApiClient } from '../../../lib/vasp-api'
+import { vaspApiClient, VASPCategory } from '../../../lib/vasp-api'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -42,6 +42,31 @@ export default function BulkUploadPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [selectedSector, setSelectedSector] = useState<VASPCategory | null>(null)
+  const [availableSectors, setAvailableSectors] = useState<VASPCategory[]>([])
+  const [loadingSectors, setLoadingSectors] = useState(true)
+
+  // Load available sectors on component mount
+  useEffect(() => {
+    const loadSectors = async () => {
+      try {
+        const sectors = await vaspApiClient.getCategories()
+        setAvailableSectors(sectors)
+        // Default to Exchange Services if available
+        const exchangeServices = sectors.find(s => s.slug === 'exchange-services')
+        if (exchangeServices) {
+          setSelectedSector(exchangeServices)
+        }
+      } catch (error) {
+        console.error('Failed to load sectors:', error)
+        setError('Failed to load available sectors')
+      } finally {
+        setLoadingSectors(false)
+      }
+    }
+
+    loadSectors()
+  }, [])
 
   const addCompany = () => {
     setCompanies([...companies, { name: '', key_partnerships: [] }])
@@ -86,6 +111,12 @@ export default function BulkUploadPage() {
       setSaving(true)
       setError(null)
 
+      // Validate sector selection
+      if (!selectedSector) {
+        setError('Please select a sector before saving companies')
+        return
+      }
+
       // Validate required fields
       const invalidCompanies = companies.filter(c => !c.name.trim())
       if (invalidCompanies.length > 0) {
@@ -112,21 +143,9 @@ export default function BulkUploadPage() {
         return
       }
 
-      // Get the Exchange Services category UUID
-      let exchangeServicesCategoryId: string
-      try {
-        const categories = await vaspApiClient.getCategories()
-        const exchangeCategory = categories.find(cat => cat.slug === 'exchange-services')
-        if (!exchangeCategory) {
-          throw new Error('Exchange Services category not found')
-        }
-        exchangeServicesCategoryId = exchangeCategory.id
-        console.log('📋 Exchange Services category ID:', exchangeServicesCategoryId)
-      } catch (categoryError) {
-        console.error('❌ Failed to get Exchange Services category:', categoryError)
-        setError('Failed to find Exchange Services category. Please contact administrator.')
-        return
-      }
+      // Use the selected sector's category ID
+      const selectedCategoryId = selectedSector.id
+      console.log('📋 Selected sector:', selectedSector.name, 'ID:', selectedCategoryId)
       
       // Save companies to database
       const savedCompanies = []
@@ -147,8 +166,8 @@ export default function BulkUploadPage() {
           const companyData = {
             name: company.name,
             slug,
-            sectors: ['exchange-services'], // Pre-selected sector
-            category_id: exchangeServicesCategoryId, // Use actual UUID
+            sectors: [selectedSector.slug], // Use selected sector
+            category_id: selectedCategoryId, // Use selected sector's ID
             pakistan_operations: true,
             year_founded: company.year_founded,
             founder_ceo_name: company.founder_ceo_name || '',
@@ -250,7 +269,7 @@ export default function BulkUploadPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'exchange-companies.csv'
+    a.download = `${selectedSector?.slug || 'companies'}-companies.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -269,7 +288,7 @@ export default function BulkUploadPage() {
                 <ArrowLeft className="h-5 w-5" />
               </button>
               <h1 className="text-xl font-semibold text-gray-900">
-                Bulk Upload - Exchange Services Companies
+                Bulk Upload - {selectedSector?.name || 'Companies'}
               </h1>
             </div>
             <div className="flex space-x-3">
@@ -318,40 +337,73 @@ export default function BulkUploadPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Sector Selection */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Exchange Services Companies</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Bulk Upload Companies</h2>
           <p className="text-gray-600 mt-2">
-            Add up to 100 exchange companies. Only company name is required. All other fields are optional.
+            Select a sector and add up to 100 companies. Only company name is required. All other fields are optional.
             After saving, you can add sector-specific details for each company.
           </p>
+          
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-800">
-              <strong>Sector:</strong> Exchange Services (pre-selected) | 
-              <strong> Companies:</strong> {companies.length}/100
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-blue-900 mb-2">
+                  Select Sector *
+                </label>
+                {loadingSectors ? (
+                  <div className="text-sm text-blue-700">Loading sectors...</div>
+                ) : (
+                  <select
+                    value={selectedSector?.id || ''}
+                    onChange={(e) => {
+                      const sector = availableSectors.find(s => s.id === e.target.value)
+                      setSelectedSector(sector || null)
+                    }}
+                    className="block w-full px-3 py-2 border border-blue-300 rounded-md bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Choose a sector...</option>
+                    {availableSectors.map((sector) => (
+                      <option key={sector.id} value={sector.id}>
+                        {sector.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+              <div className="text-sm text-blue-800">
+                <strong>Companies:</strong> {companies.length}/100
+              </div>
+            </div>
           </div>
         </div>
 
         {/* CSV Import */}
-        <div className="mb-6">
-          <CSVImport onImport={handleCSVImport} />
-        </div>
+        {selectedSector && (
+          <div className="mb-6">
+            <CSVImport onImport={handleCSVImport} />
+          </div>
+        )}
 
         {/* Add Company Button */}
         <div className="mb-6">
           <button
             onClick={addCompany}
-            disabled={companies.length >= 100}
+            disabled={companies.length >= 100 || !selectedSector}
             className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Company ({companies.length}/100)
           </button>
+          {!selectedSector && (
+            <p className="text-sm text-gray-500 mt-2">Please select a sector first</p>
+          )}
         </div>
 
         {/* Companies List */}
-        <div className="space-y-8">
-          {companies.map((company, index) => (
+        {selectedSector && (
+          <div className="space-y-8">
+            {companies.map((company, index) => (
             <div key={index} className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -641,10 +693,12 @@ export default function BulkUploadPage() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Save Button */}
-        <div className="mt-8 flex justify-end">
+        {selectedSector && (
+          <div className="mt-8 flex justify-end">
           <button
             onClick={handleSave}
             disabled={saving}
@@ -657,7 +711,8 @@ export default function BulkUploadPage() {
             )}
             Save All {companies.length} Companies
           </button>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
