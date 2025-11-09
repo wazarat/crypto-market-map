@@ -21,7 +21,7 @@ export default function CompanyPage() {
   const params = useParams()
   const slug = params?.slug as string
   
-  const [company, setCompany] = useState<CompanyDetail | null>(null)
+  const [company, setCompany] = useState<any | null>(null)
   const [research, setResearch] = useState<ResearchEntry[]>([])
   const [notes, setNotes] = useState<UserNote[]>([])
   const [loading, setLoading] = useState(true)
@@ -222,10 +222,158 @@ export default function CompanyPage() {
                 {company.website && (
                   <span className="inline-flex items-center">
                     <Globe className="h-4 w-4 mr-1" />
-                    {new URL(company.website).hostname}
+                    {(() => {
+                      try {
+                        return new URL(company.website).hostname
+                      } catch {
+                        return company.website
+                      }
+                    })()}
                   </span>
                 )}
               </div>
+            </div>
+
+            {/* Detailed Company Information */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-6">Company Details</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h3 className="font-medium text-gray-900 mb-3">Basic Information</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Founded:</span>
+                      <span className="text-gray-900">{company.year_founded || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">CEO/Founder:</span>
+                      <span className="text-gray-900">{company.founder_ceo_name || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Headquarters:</span>
+                      <span className="text-gray-900">{company.headquarters_location || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Pakistan Operations:</span>
+                      <span className="text-gray-900">{company.pakistan_operations ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Employees:</span>
+                      <span className="text-gray-900">{company.employee_count || 'Not specified'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h3 className="font-medium text-gray-900 mb-3">Contact Information</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Website:</span>
+                      <span className="text-gray-900">
+                        {company.website ? (
+                          <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-700">
+                            Visit Website
+                          </a>
+                        ) : 'Not specified'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Contact Email:</span>
+                      <span className="text-gray-900">{company.contact_email || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Contact Phone:</span>
+                      <span className="text-gray-900">{company.contact_phone || 'Not specified'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Regulatory Information */}
+                <div className="space-y-4">
+                  <h3 className="font-medium text-gray-900 mb-3">Regulatory Status</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">License Status:</span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        company.license_status === 'Granted' ? 'bg-green-100 text-green-800' :
+                        company.license_status === 'Applied' ? 'bg-yellow-100 text-yellow-800' :
+                        company.license_status === 'Under Review' ? 'bg-blue-100 text-blue-800' :
+                        company.license_status === 'Suspended' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {company.license_status || 'None'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Verification Status:</span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        company.verification_status === 'Verified' ? 'bg-green-100 text-green-800' :
+                        company.verification_status === 'Under Review' ? 'bg-blue-100 text-blue-800' :
+                        company.verification_status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {company.verification_status || 'Pending'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">SECP Registration:</span>
+                      <span className="text-gray-900">{company.secp_registration_number || 'Not specified'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">PVARA License:</span>
+                      <span className="text-gray-900">{company.pvara_license_number || 'Not specified'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Financial Information */}
+                <div className="space-y-4">
+                  <h3 className="font-medium text-gray-900 mb-3">Financial Information</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Total Funding (PKR):</span>
+                      <span className="text-gray-900">
+                        {company.total_funding_pkr ? `₨${company.total_funding_pkr.toLocaleString()}` : 'Not specified'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">AML/CFT Rating:</span>
+                      <span className="text-gray-900">{company.aml_cft_compliance_rating || 'Not assessed'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Company Description */}
+              {(company.company_description || company.company_overview) && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="font-medium text-gray-900 mb-3">Description</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {company.company_description || company.company_overview}
+                  </p>
+                </div>
+              )}
+
+              {/* Key Partnerships */}
+              {company.key_partnerships && company.key_partnerships.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="font-medium text-gray-900 mb-3">Key Partnerships</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {company.key_partnerships.map((partnership: string, index: number) => (
+                      <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        {partnership}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Research Section */}
