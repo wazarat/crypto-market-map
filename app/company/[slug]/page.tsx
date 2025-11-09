@@ -12,6 +12,7 @@ import { CompanyDetail, ResearchEntry } from '../../../lib/api'
 import { supabase, UserNote } from '../../../lib/supabase'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
 import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
+import ChatbaseWidgetSimple from '../../../components/ChatbaseWidgetSimple'
 import EnvDebug from '../../../components/EnvDebug'
 
 // Mock user ID - replace with real auth later
@@ -437,9 +438,13 @@ export default function CompanyPage() {
         </div>
       </main>
 
-      {/* Chatbase Widget - Testing both implementations */}
+      {/* Chatbase Widget - Testing multiple implementations */}
       {company && (
         <>
+          <ChatbaseWidgetSimple 
+            companyName={company.name}
+            companyData={company}
+          />
           <ChatbaseWidget 
             companyName={company.name}
             companyData={company}
@@ -449,6 +454,19 @@ export default function CompanyPage() {
             companyData={company}
           />
         </>
+      )}
+
+      {/* Debug Tools */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 left-4 bg-yellow-100 border border-yellow-300 rounded-lg p-3 text-sm">
+          <div className="font-medium text-yellow-800 mb-2">Debug Tools</div>
+          <Link 
+            href="/admin/test-chatbase" 
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            Test Chatbase Integration
+          </Link>
+        </div>
       )}
     </div>
   )
