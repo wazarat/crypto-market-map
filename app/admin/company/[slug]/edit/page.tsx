@@ -115,6 +115,12 @@ export default function EditCompanyPage() {
       setSaving(true)
       setError(null)
 
+      console.log('💾 Saving company data:', {
+        name: data.name,
+        sectors: data.sectors,
+        sectorsCount: data.sectors?.length || 0
+      })
+
       // Update company basic information
       await vaspApiClient.updateCompany(company.id, {
         ...data,
@@ -125,7 +131,27 @@ export default function EditCompanyPage() {
 
       // Update sector assignments if sectors are provided
       if (data.sectors && data.sectors.length > 0) {
-        await vaspApiClient.updateCompanySectors(company.id, data.sectors)
+        console.log('🔄 Updating sectors for company:', company.id, 'sectors:', data.sectors)
+        try {
+          if (typeof vaspApiClient.updateCompanySectors === 'function') {
+            await vaspApiClient.updateCompanySectors(company.id, data.sectors)
+            console.log('✅ Sectors updated successfully')
+          } else {
+            console.warn('⚠️ updateCompanySectors method not available, using fallback')
+            // Fallback: Update the main category to the first selected sector
+            if (data.sectors.length > 0) {
+              const sectors = await vaspApiClient.getCategories()
+              const firstSector = sectors.find(s => s.slug === data.sectors[0])
+              if (firstSector) {
+                await vaspApiClient.updateCompany(company.id, { category_id: firstSector.id })
+                console.log('✅ Updated main category as fallback')
+              }
+            }
+          }
+        } catch (sectorError) {
+          console.error('❌ Error updating sectors:', sectorError)
+          // Don't throw - let the main save succeed even if sector update fails
+        }
       }
 
       setFormData(data)
