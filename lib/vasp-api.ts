@@ -245,20 +245,35 @@ class VASPApiClient {
     return data || []
   }
 
-  // Get companies by category
+  // Get companies by category (updated to use many-to-many relationship)
   async getCompaniesByCategory(categorySlug: string): Promise<VASPCompanyWithDetails[]> {
     const client = this.ensureSupabase()
+    
+    // First get the category ID
+    const { data: category, error: categoryError } = await client
+      .from('vasp_categories')
+      .select('id')
+      .eq('slug', categorySlug)
+      .single()
+    
+    if (categoryError) throw categoryError
+    if (!category) return []
+    
+    // Then get companies through the junction table
     const { data, error } = await client
-      .from('vasp_companies')
+      .from('company_sectors')
       .select(`
-        *,
-        category:vasp_categories!inner(*)
+        vasp_companies (
+          *,
+          category:vasp_categories!vasp_companies_category_id_fkey(*)
+        )
       `)
-      .eq('category.slug', categorySlug)
-      .order('name')
-
+      .eq('category_id', category.id)
+    
     if (error) throw error
-    return data || []
+    
+    // Extract and return companies
+    return data?.map((item: any) => item.vasp_companies).filter(Boolean) || []
   }
 
   // Admin functions for Canhav
@@ -289,6 +304,42 @@ class VASPApiClient {
     if (error) throw error
     return data
   }
+
+  // Update company sectors (many-to-many relationship)
+  async updateCompanySectors(companyId: string, sectorSlugs: string[]): Promise<void> {
+    const client = this.ensureSupabase()
+    
+    // First, get category IDs from slugs
+    const { data: categories, error: categoryError } = await client
+      .from('vasp_categories')
+      .select('id, slug')
+      .in('slug', sectorSlugs)
+    
+    if (categoryError) throw categoryError
+    
+    // Delete existing sector assignments
+    const { error: deleteError } = await client
+      .from('company_sectors')
+      .delete()
+      .eq('company_id', companyId)
+    
+    if (deleteError) throw deleteError
+    
+    // Insert new sector assignments
+    if (categories && categories.length > 0) {
+      const sectorAssignments = categories.map(category => ({
+        company_id: companyId,
+        category_id: category.id
+      }))
+      
+      const { error: insertError } = await client
+        .from('company_sectors')
+        .insert(sectorAssignments)
+      
+      if (insertError) throw insertError
+    }
+  }
+
 
   // Delete company
   async deleteCompany(id: string): Promise<void> {

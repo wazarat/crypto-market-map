@@ -123,6 +123,11 @@ export default function EditCompanyPage() {
         last_updated_by: 'admin@pakistancrypto.council' // In real app, get from auth
       })
 
+      // Update sector assignments if sectors are provided
+      if (data.sectors && data.sectors.length > 0) {
+        await vaspApiClient.updateCompanySectors(company.id, data.sectors)
+      }
+
       setFormData(data)
       setSuccess(true)
       setShowSectorSections(true)
