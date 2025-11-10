@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Upload, FileText, Download, MessageCircle, User, Calendar, Plus, Send } from 'lucide-react'
+import { Upload, FileText, Download, MessageCircle, User, Calendar, Plus, Send, ExternalLink, Link } from 'lucide-react'
 
 interface ResearchItem {
   id: string
@@ -41,12 +41,15 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
   const [newComments, setNewComments] = useState<Record<string, string>>({})
 
   // Upload form state
+  const [uploadType, setUploadType] = useState<'file' | 'link'>('file')
   const [uploadForm, setUploadForm] = useState({
     title: '',
     description: '',
     submitterName: '',
     submitterEmail: '',
-    file: null as File | null
+    file: null as File | null,
+    link: '',
+    linkType: 'article' as 'article' | 'report' | 'analysis' | 'news' | 'other'
   })
 
   useEffect(() => {
@@ -70,28 +73,54 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
     }
   }
 
-  const handleFileUpload = async (e: React.FormEvent) => {
+  const handleSubmitResearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!uploadForm.file || !uploadForm.title || !uploadForm.submitterName) return
+    
+    // Validate required fields based on upload type
+    if (!uploadForm.title || !uploadForm.submitterName) return
+    if (uploadType === 'file' && !uploadForm.file) return
+    if (uploadType === 'link' && !uploadForm.link) return
 
     setUploading(true)
     try {
-      // TODO: Implement actual file upload
-      const formData = new FormData()
-      formData.append('file', uploadForm.file)
-      formData.append('title', uploadForm.title)
-      formData.append('description', uploadForm.description)
-      formData.append('submitterName', uploadForm.submitterName)
-      formData.append('submitterEmail', uploadForm.submitterEmail)
-      formData.append('companySlug', companySlug)
+      if (uploadType === 'file') {
+        // Handle file upload
+        const formData = new FormData()
+        formData.append('file', uploadForm.file!)
+        formData.append('title', uploadForm.title)
+        formData.append('description', uploadForm.description)
+        formData.append('submitterName', uploadForm.submitterName)
+        formData.append('submitterEmail', uploadForm.submitterEmail)
+        formData.append('companySlug', companySlug)
+        formData.append('type', 'file')
 
-      // const response = await fetch('/api/research/upload', {
-      //   method: 'POST',
-      //   body: formData
-      // })
+        // const response = await fetch('/api/research/upload', {
+        //   method: 'POST',
+        //   body: formData
+        // })
 
-      // Mock success
-      console.log('File upload would happen here:', formData)
+        console.log('File upload would happen here:', formData)
+      } else {
+        // Handle link submission
+        const linkData = {
+          title: uploadForm.title,
+          description: uploadForm.description,
+          submitterName: uploadForm.submitterName,
+          submitterEmail: uploadForm.submitterEmail,
+          companySlug: companySlug,
+          link: uploadForm.link,
+          linkType: uploadForm.linkType,
+          type: 'link'
+        }
+
+        // const response = await fetch('/api/research/link', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(linkData)
+        // })
+
+        console.log('Link submission would happen here:', linkData)
+      }
       
       // Reset form
       setUploadForm({
@@ -99,7 +128,9 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
         description: '',
         submitterName: '',
         submitterEmail: '',
-        file: null
+        file: null,
+        link: '',
+        linkType: 'article'
       })
       setShowUploadForm(false)
       
@@ -169,14 +200,14 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Upload Research
+          Add Research
         </button>
       </div>
 
       {/* Upload Form */}
       {showUploadForm && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <form onSubmit={handleFileUpload} className="space-y-4">
+          <form onSubmit={handleSubmitResearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -232,18 +263,88 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
               />
             </div>
 
+            {/* Upload Type Toggle */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Research File * (PDF, Word)
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Research Type *
               </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => setUploadForm(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
+              <div className="flex space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="file"
+                    checked={uploadType === 'file'}
+                    onChange={(e) => setUploadType(e.target.value as 'file' | 'link')}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">Upload File (PDF, Word)</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="link"
+                    checked={uploadType === 'link'}
+                    onChange={(e) => setUploadType(e.target.value as 'file' | 'link')}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">Share Link</span>
+                </label>
+              </div>
             </div>
+
+            {/* Conditional Fields Based on Upload Type */}
+            {uploadType === 'file' ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Research File * (PDF, Word)
+                </label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => setUploadForm(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required={uploadType === 'file'}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported formats: PDF, DOC, DOCX (max 10MB)
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Research Link *
+                  </label>
+                  <input
+                    type="url"
+                    value={uploadForm.link}
+                    onChange={(e) => setUploadForm(prev => ({ ...prev, link: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="https://example.com/research-article"
+                    required={uploadType === 'link'}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Link to research article, report, analysis, or relevant content
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Link Type
+                  </label>
+                  <select
+                    value={uploadForm.linkType}
+                    onChange={(e) => setUploadForm(prev => ({ ...prev, linkType: e.target.value as any }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="article">Article</option>
+                    <option value="report">Report</option>
+                    <option value="analysis">Analysis</option>
+                    <option value="news">News</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-end space-x-3">
               <button
@@ -255,7 +356,13 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
               </button>
               <button
                 type="submit"
-                disabled={uploading || !uploadForm.file || !uploadForm.title || !uploadForm.submitterName}
+                disabled={
+                  uploading || 
+                  !uploadForm.title || 
+                  !uploadForm.submitterName ||
+                  (uploadType === 'file' && !uploadForm.file) ||
+                  (uploadType === 'link' && !uploadForm.link)
+                }
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
               >
                 {uploading ? (
@@ -263,7 +370,7 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
                 ) : (
                   <Upload className="h-4 w-4 mr-2" />
                 )}
-                Upload Research
+                {uploadType === 'file' ? 'Upload Research' : 'Share Link'}
               </button>
             </div>
           </form>
