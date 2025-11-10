@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ExternalLink, Building2, TrendingUp, LogOut, User } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { unifiedApiClient } from '../lib/unified-api'
 import { Sector } from '../lib/api'
+import EnhancedSectorCard from '../components/EnhancedSectorCard'
 import { useSimpleAuth } from '../lib/simple-auth-context'
 
 export default function HomePage() {
@@ -58,18 +60,30 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-lg"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  canhav.io
+          <div className="flex items-center justify-between h-20">
+            <motion.div 
+              className="flex items-center space-x-4"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <div className="flex flex-col">
+                <span className="text-3xl font-bold font-inter-tight bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  CanHav Research
+                </span>
+                <span className="text-sm font-medium text-gray-600 -mt-1">
+                  Simplifying Crypto
                 </span>
               </div>
-            </div>
+            </motion.div>
             <div className="flex items-center space-x-6">
               <nav className="hidden md:flex space-x-8">
                 <a href="#" className="text-gray-600 hover:text-gray-900">Companies</a>
@@ -118,105 +132,48 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.h2 
+            className="text-5xl font-bold font-inter-tight bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
             Explore the Crypto Ecosystem
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
             Click on a sector to discover companies and projects shaping the future of digital finance.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        {/* Sectors Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sectors.map((sector) => (
-            <SectorCard key={sector.id} sector={sector} />
+        {/* Enhanced Sectors Grid - Masonry Layout */}
+        <motion.div 
+          className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        >
+          {sectors.map((sector, index) => (
+            <div key={sector.id} className="break-inside-avoid mb-6">
+              <EnhancedSectorCard sector={sector} index={index} />
+            </div>
           ))}
-        </div>
+        </motion.div>
       </main>
-    </div>
-  )
-}
-
-function SectorCard({ sector }: { sector: Sector }) {
-  const { isAuthenticated } = useSimpleAuth()
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200 transition-all duration-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">{sector.name}</h3>
-        <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-          {sector.company_count} companies
-        </span>
-      </div>
-      
-      {sector.description && (
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{sector.description}</p>
-      )}
-
-      {/* Company Pills */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {sector.companies.slice(0, 6).map((company) => (
-          isAuthenticated ? (
-            <Link
-              key={company.id}
-              href={`/company/${company.slug}`}
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
-            >
-              {company.logo_url && (
-                <img 
-                  src={company.logo_url} 
-                  alt={company.name} 
-                  className="w-4 h-4 rounded-full mr-1"
-                />
-              )}
-              {company.name}
-            </Link>
-          ) : (
-            <span
-              key={company.id}
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500 cursor-not-allowed"
-              title="Login required to view company details"
-            >
-              {company.logo_url && (
-                <img 
-                  src={company.logo_url} 
-                  alt={company.name} 
-                  className="w-4 h-4 rounded-full mr-1 opacity-50"
-                />
-              )}
-              {company.name}
-            </span>
-          )
-        ))}
-        {sector.companies.length > 6 && (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-            +{sector.companies.length - 6} more
-          </span>
-        )}
-      </div>
-
-      {/* View All Button */}
-      {isAuthenticated ? (
-        <Link
-          href={`/sector/${sector.slug}`}
-          className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700"
-        >
-          View all companies
-          <ExternalLink className="ml-1 h-4 w-4" />
-        </Link>
-      ) : (
-        <Link
-          href="/login"
-          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600"
-        >
-          Login to view companies
-          <ExternalLink className="ml-1 h-4 w-4" />
-        </Link>
-      )}
     </div>
   )
 }
