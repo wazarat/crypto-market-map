@@ -35,16 +35,9 @@ const sectorGlows = {
   'asset-tokens': 'hover:shadow-violet-500/25',
 }
 
-// More subtle height variations for better spacing
-const cardHeights = [
-  'h-52', 'h-48', 'h-52', 'h-48', 'h-52', 
-  'h-48', 'h-52', 'h-48', 'h-52', 'h-48'
-]
-
 export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCardProps) {
   const gradient = sectorGradients[sector.slug as keyof typeof sectorGradients] || 'from-gray-500/20 to-slate-500/20'
   const glow = sectorGlows[sector.slug as keyof typeof sectorGlows] || 'hover:shadow-gray-500/25'
-  const height = cardHeights[index % cardHeights.length]
 
   return (
     <motion.div
@@ -59,10 +52,11 @@ export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCard
         damping: 15
       }}
       whileHover={{ 
+        scale: 1.02,
         y: -8,
         transition: { duration: 0.3, type: "spring", stiffness: 300 }
       }}
-      className={`group relative ${height} w-full`}
+      className="group relative w-full min-h-[200px] h-full"
     >
       <Link href={`/sector/${sector.slug}`}>
         <div className={`
@@ -76,32 +70,38 @@ export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCard
           {/* Gradient Overlay */}
           <div className={`
             absolute inset-0 bg-gradient-to-br ${gradient}
-            opacity-60 group-hover:opacity-80 transition-opacity duration-500
+            opacity-60 group-hover:opacity-90 transition-opacity duration-500
           `} />
           
           {/* Glow Effect */}
           <div className="
             absolute inset-0 opacity-0 group-hover:opacity-100
-            bg-gradient-radial from-white/10 via-transparent to-transparent
+            bg-gradient-radial from-white/15 via-transparent to-transparent
             transition-opacity duration-500
           " />
           
-          {/* Content */}
-          <div className="relative h-full p-6 flex flex-col justify-between">
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-gray-800 transition-colors leading-tight">
+          {/* Content with Consistent Vertical Rhythm */}
+          <div className="relative h-full p-6 flex flex-col">
+            {/* Title */}
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-0 group-hover:text-gray-800 transition-colors leading-tight">
                 {sector.name}
               </h3>
+            </div>
+            
+            {/* Description - Flexible Space */}
+            <div className="flex-1 mb-4">
               <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 group-hover:text-gray-600 transition-colors">
                 {sector.description}
               </p>
             </div>
             
-            <div className="flex items-center justify-between mt-4">
+            {/* Footer - Always at Bottom */}
+            <div className="flex items-center justify-between mt-auto">
               <span className="
                 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
                 bg-white/30 backdrop-blur-sm border border-white/20
-                text-gray-800 group-hover:bg-white/40 transition-all duration-300
+                text-gray-800 group-hover:bg-white/50 transition-all duration-300
               ">
                 {sector.company_count} companies
               </span>
@@ -109,14 +109,35 @@ export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCard
               <motion.div
                 className="
                   w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30
-                  flex items-center justify-center group-hover:bg-white/30 transition-all duration-300
+                  flex items-center justify-center group-hover:bg-white/40 transition-all duration-300
                 "
-                whileHover={{ scale: 1.1, rotate: 15 }}
+                whileHover={{ scale: 1.15, rotate: 15 }}
+                animate={{ 
+                  x: [0, 2, 0],
+                  transition: { 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }
+                }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <svg className="w-4 h-4 text-gray-700 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <motion.svg 
+                  className="w-4 h-4 text-gray-700 group-hover:text-gray-600" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  animate={{
+                    x: [0, 3, 0],
+                    transition: {
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }
+                  }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                </motion.svg>
               </motion.div>
             </div>
           </div>

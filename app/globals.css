@@ -29,6 +29,10 @@
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
+  
+  .grid-auto-rows-fr {
+    grid-auto-rows: 1fr;
+  }
 }
 
 /* Custom Font Loading */
