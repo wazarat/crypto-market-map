@@ -50,7 +50,7 @@ export function convertToCSV(companies: VASPCompanyWithDetails[]): string {
     escapeCsvField(company.contact_email || ''),
     escapeCsvField(company.contact_phone || ''),
     company.employee_count?.toString() || '',
-    company.total_funding_pkr?.toString() || '',
+    company.private_company ? 'Private' : (company.public_company ? 'Public' : 'Unknown'),
     escapeCsvField(company.key_partnerships?.join('; ') || ''),
     escapeCsvField(company.company_description),
     escapeCsvField(company.twitter_handle || ''),

@@ -23,7 +23,8 @@ interface CompanyFormData {
   point_of_contact_email: string
   point_of_contact_phone: string
   employee_count: number | null
-  total_funding_pkr: number | null
+  private_company: boolean
+  public_company: boolean
   key_partnerships: string[]
   company_description: string
   company_overview: string

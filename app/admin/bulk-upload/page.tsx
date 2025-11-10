@@ -24,7 +24,8 @@ interface CompanyData {
   social_media_linkedin?: string
   social_media_facebook?: string
   employee_count?: number | null
-  total_funding_pkr?: number | null
+  private_company?: boolean
+  public_company?: boolean
   key_partnerships?: string[]
   company_description?: string
   company_overview?: string
@@ -181,7 +182,8 @@ export default function BulkUploadPage() {
             social_media_linkedin: company.social_media_linkedin || '',
             social_media_facebook: company.social_media_facebook || '',
             employee_count: company.employee_count,
-            total_funding_pkr: company.total_funding_pkr,
+            private_company: company.private_company || false,
+            public_company: company.public_company || false,
             key_partnerships: company.key_partnerships || [],
             company_description: company.company_description || '',
             company_overview: company.company_overview || '',
@@ -254,7 +256,7 @@ export default function BulkUploadPage() {
         company.social_media_linkedin || '',
         company.social_media_facebook || '',
         company.employee_count || '',
-        company.total_funding_pkr || '',
+        company.private_company ? 'Private' : (company.public_company ? 'Public' : 'Unknown'),
         (company.key_partnerships || []).join('; '),
         company.company_description || '',
         company.company_overview || '',
@@ -571,14 +573,27 @@ export default function BulkUploadPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Total Funding (PKR)</label>
-                  <input
-                    type="number"
-                    value={company.total_funding_pkr || ''}
-                    onChange={(e) => updateCompany(index, 'total_funding_pkr', e.target.value ? parseInt(e.target.value) : null)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., 10000000"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Company Type</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={company.private_company || false}
+                        onChange={(e) => updateCompany(index, 'private_company', e.target.checked)}
+                        className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700">Private Company</span>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={company.public_company || false}
+                        onChange={(e) => updateCompany(index, 'public_company', e.target.checked)}
+                        className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700">Public Company</span>
+                    </label>
+                  </div>
                 </div>
 
                 {/* Regulatory Information */}

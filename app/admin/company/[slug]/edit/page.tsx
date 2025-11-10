@@ -23,7 +23,8 @@ interface CompanyFormData {
   point_of_contact_email: string
   point_of_contact_phone: string
   employee_count: number | null
-  total_funding_pkr: number | null
+  private_company: boolean
+  public_company: boolean
   key_partnerships: string[]
   company_description: string
   company_overview: string
@@ -81,7 +82,8 @@ export default function EditCompanyPage() {
         point_of_contact_email: companyData.point_of_contact_email || '',
         point_of_contact_phone: companyData.point_of_contact_phone || '',
         employee_count: companyData.employee_count,
-        total_funding_pkr: companyData.total_funding_pkr,
+        private_company: companyData.private_company || false,
+        public_company: companyData.public_company || false,
         key_partnerships: companyData.key_partnerships || [],
         company_description: companyData.company_description || '',
         company_overview: companyData.company_overview || '',

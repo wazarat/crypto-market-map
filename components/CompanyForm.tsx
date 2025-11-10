@@ -22,7 +22,8 @@ interface CompanyFormData {
   
   // Business Information
   employee_count: number | null
-  total_funding_pkr: number | null
+  private_company: boolean
+  public_company: boolean
   key_partnerships: string[]
   company_description: string
   company_overview: string
@@ -85,7 +86,8 @@ export default function CompanyForm({ initialData, onSave, onCancel, isEditing =
     point_of_contact_email: '',
     point_of_contact_phone: '',
     employee_count: null,
-    total_funding_pkr: null,
+    private_company: false,
+    public_company: false,
     key_partnerships: [],
     company_description: '',
     company_overview: '',
@@ -425,18 +427,30 @@ export default function CompanyForm({ initialData, onSave, onCancel, isEditing =
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <DollarSign className="inline mr-1 h-4 w-4" />
-                Total Funding Raised (PKR)
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                <Building2 className="inline mr-1 h-4 w-4" />
+                Company Type
               </label>
-              <input
-                type="number"
-                value={formData.total_funding_pkr || ''}
-                onChange={(e) => handleInputChange('total_funding_pkr', e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="e.g., 100000000"
-                min="0"
-              />
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.private_company}
+                    onChange={(e) => handleInputChange('private_company', e.target.checked)}
+                    className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <span className="text-sm text-gray-700">Private Company</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.public_company}
+                    onChange={(e) => handleInputChange('public_company', e.target.checked)}
+                    className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <span className="text-sm text-gray-700">Public Company (Publicly Traded)</span>
+                </label>
+              </div>
             </div>
           </div>
 
