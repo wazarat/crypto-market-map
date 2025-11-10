@@ -160,17 +160,15 @@ export default function HomePage() {
           </motion.p>
         </motion.div>
 
-        {/* Enhanced Sectors Grid - Masonry Layout */}
+        {/* Enhanced Sectors Grid - Controlled Layout */}
         <motion.div 
-          className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
           {sectors.map((sector, index) => (
-            <div key={sector.id} className="break-inside-avoid mb-6">
-              <EnhancedSectorCard sector={sector} index={index} />
-            </div>
+            <EnhancedSectorCard key={sector.id} sector={sector} index={index} />
           ))}
         </motion.div>
       </main>

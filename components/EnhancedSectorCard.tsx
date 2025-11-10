@@ -35,10 +35,10 @@ const sectorGlows = {
   'asset-tokens': 'hover:shadow-violet-500/25',
 }
 
-// Asymmetric heights for masonry effect
+// More subtle height variations for better spacing
 const cardHeights = [
-  'h-48', 'h-52', 'h-56', 'h-48', 'h-60', 
-  'h-52', 'h-48', 'h-56', 'h-52', 'h-48'
+  'h-52', 'h-48', 'h-52', 'h-48', 'h-52', 
+  'h-48', 'h-52', 'h-48', 'h-52', 'h-48'
 ]
 
 export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCardProps) {
@@ -62,7 +62,7 @@ export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCard
         y: -8,
         transition: { duration: 0.3, type: "spring", stiffness: 300 }
       }}
-      className={`group relative ${height}`}
+      className={`group relative ${height} w-full`}
     >
       <Link href={`/sector/${sector.slug}`}>
         <div className={`
@@ -88,8 +88,8 @@ export default function EnhancedSectorCard({ sector, index }: EnhancedSectorCard
           
           {/* Content */}
           <div className="relative h-full p-6 flex flex-col justify-between">
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-800 transition-colors">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-gray-800 transition-colors leading-tight">
                 {sector.name}
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 group-hover:text-gray-600 transition-colors">
