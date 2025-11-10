@@ -89,9 +89,11 @@ class VASPApiClient {
     return data || []
   }
 
-  // Get company by slug with sector details
+  // Get company by slug with sector details (supports multiple sectors)
   async getCompanyBySlug(slug: string): Promise<VASPCompanyWithDetails | null> {
     const client = this.ensureSupabase()
+    
+    // Get company with its primary category
     const { data: company, error: companyError } = await client
       .from('vasp_companies')
       .select(`
@@ -104,131 +106,137 @@ class VASPApiClient {
     if (companyError) throw companyError
     if (!company) return null
 
-    // Get sector-specific details based on category
-    let sectorDetails = null
-    const categorySlug = company.category.slug
+    // Get all sectors this company is assigned to via company_sectors table
+    const { data: companySectors, error: sectorsError } = await client
+      .from('company_sectors')
+      .select(`
+        category_id,
+        category:vasp_categories(slug, name)
+      `)
+      .eq('company_id', company.id)
 
-    try {
-      switch (categorySlug) {
-        case 'advisory-services':
-          try {
-            const { data: advisoryData, error } = await client
-              .from('advisory_services_details')
-              .select('*')
-              .eq('company_id', company.id)
-              .single()
-            if (!error) {
+    let allSectors = []
+    let allSectorDetails = {}
+
+    if (!sectorsError && companySectors && companySectors.length > 0) {
+      // Company has multiple sector assignments
+      allSectors = companySectors.map((cs: any) => cs.category.slug)
+      
+      // Fetch sector-specific details for each sector
+      for (const sectorAssignment of companySectors) {
+        const sectorSlug = (sectorAssignment as any).category.slug
+        let sectorDetails = null
+
+        try {
+          switch (sectorSlug) {
+            case 'advisory-services':
+              const { data: advisoryData } = await client
+                .from('advisory_services_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
               sectorDetails = advisoryData
-            }
-          } catch (err) {
-            console.log('No advisory services details found for company:', company.id)
-            sectorDetails = null
-          }
-          break
+              break
 
-        case 'broker-dealer-services':
-          const { data: brokerData } = await client
-            .from('broker_dealer_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = brokerData
-          break
+            case 'broker-dealer-services':
+              const { data: brokerData } = await client
+                .from('broker_dealer_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = brokerData
+              break
 
-        case 'custody-services':
-          try {
-            const { data: custodyData, error } = await client
-              .from('custody_services_details')
-              .select('*')
-              .eq('company_id', company.id)
-              .single()
-            if (!error) {
+            case 'custody-services':
+              const { data: custodyData } = await client
+                .from('custody_services_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
               sectorDetails = custodyData
-            }
-                     } catch (err) {
-            console.log('No custody services details found for company:', company.id)
-            sectorDetails = null
-          }
-          break
+              break
 
-        case 'exchange-services':
-          try {
-            const { data: exchangeData, error } = await client
-              .from('exchange_services_details')
-              .select('*')
-              .eq('company_id', company.id)
-              .single()
-            if (!error) {
+            case 'exchange-services':
+              const { data: exchangeData } = await client
+                .from('exchange_services_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
               sectorDetails = exchangeData
-            }
-          } catch (err) {
-            console.log('No exchange services details found for company:', company.id)
-            sectorDetails = null
+              break
+
+            case 'lending-borrowing':
+              const { data: lendingData } = await client
+                .from('lending_borrowing_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = lendingData
+              break
+
+            case 'derivatives':
+              const { data: derivativesData } = await client
+                .from('derivatives_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = derivativesData
+              break
+
+            case 'asset-management':
+              const { data: assetMgmtData } = await client
+                .from('asset_management_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = assetMgmtData
+              break
+
+            case 'transfer-settlement':
+              const { data: transferData } = await client
+                .from('transfer_settlement_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = transferData
+              break
+
+            case 'fiat-tokens':
+              const { data: fiatTokenData } = await client
+                .from('fiat_referenced_token_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = fiatTokenData
+              break
+
+            case 'asset-tokens':
+              const { data: assetTokenData } = await client
+                .from('asset_referenced_token_details')
+                .select('*')
+                .eq('company_id', company.id)
+                .single()
+              sectorDetails = assetTokenData
+              break
           }
-          break
 
-        case 'lending-borrowing':
-          const { data: lendingData } = await client
-            .from('lending_borrowing_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = lendingData
-          break
-
-        case 'derivatives':
-          const { data: derivativesData } = await client
-            .from('derivatives_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = derivativesData
-          break
-
-        case 'asset-management':
-          const { data: assetMgmtData } = await client
-            .from('asset_management_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = assetMgmtData
-          break
-
-        case 'transfer-settlement':
-          const { data: transferData } = await client
-            .from('transfer_settlement_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = transferData
-          break
-
-        case 'fiat-tokens':
-          const { data: fiatTokenData } = await client
-            .from('fiat_referenced_token_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = fiatTokenData
-          break
-
-        case 'asset-tokens':
-          const { data: assetTokenData } = await client
-            .from('asset_referenced_token_details')
-            .select('*')
-            .eq('company_id', company.id)
-            .single()
-          sectorDetails = assetTokenData
-          break
+          if (sectorDetails) {
+            (allSectorDetails as any)[sectorSlug] = sectorDetails
+          }
+        } catch (error) {
+          console.log(`No ${sectorSlug} details found for ${company.name}`)
+        }
       }
-    } catch (error) {
-      // Sector details not found - this is okay
-      console.log(`No sector details found for ${company.name}`)
+    } else {
+      // Fallback to single category if no multi-sector assignments
+      allSectors = [company.category.slug]
+      // Keep existing single-sector logic as fallback
     }
 
     return {
       ...company,
-      sector_details: sectorDetails
+      sectors: allSectors,
+      sector_details: allSectorDetails
     }
   }
 
