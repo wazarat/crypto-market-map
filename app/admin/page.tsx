@@ -247,7 +247,7 @@ export default function AdminDashboard() {
                 PVARA Regulations 2025 Compliance
               </h3>
               <p className="mt-2 text-blue-800">
-                This system is designed to help Pakistan Crypto Council maintain comprehensive 
+                This system is designed to help Canhav maintain comprehensive 
                 records as required by the Virtual Asset Service Provider Regulations 2025. 
                 All data fields align with Schedule III requirements for fit-and-proper assessments, 
                 minimum capital requirements, and ongoing supervision obligations.

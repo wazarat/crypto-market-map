@@ -1,4 +1,4 @@
-// Enhanced VASP API Client for Pakistan Crypto Council
+// Enhanced VASP API Client for Canhav
 import { supabase } from './supabase'
 import { BaseCompany, VASPCategory } from './enhanced-company-data'
 
@@ -261,7 +261,7 @@ class VASPApiClient {
     return data || []
   }
 
-  // Admin functions for Pakistan Crypto Council
+  // Admin functions for Canhav
 
   // Create company
   async createCompany(companyData: Partial<BaseCompany>): Promise<BaseCompany> {

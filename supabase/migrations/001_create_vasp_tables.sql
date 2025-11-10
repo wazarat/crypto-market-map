@@ -1,5 +1,5 @@
 -- VASP (Virtual Asset Service Provider) Database Schema
--- Pakistan Crypto Council - PVARA Regulations 2025 Compliance
+-- Canhav - PVARA Regulations 2025 Compliance
 
 -- Categories table
 CREATE TABLE vasp_categories (

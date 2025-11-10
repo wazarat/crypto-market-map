@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive setup instructions for the Pakistan Virtual Asset Service Provider (VASP) database system, designed to comply with PVARA Regulations 2025 and serve the Pakistan Crypto Council.
+This document provides comprehensive setup instructions for the Pakistan Virtual Asset Service Provider (VASP) database system, designed to comply with PVARA Regulations 2025 and serve Canhav.
 
 ## Database Schema
 
@@ -264,7 +264,7 @@ psql -h your-db-host -U postgres -d postgres < pakistan_vasp_backup.sql
 For technical support or questions about the Pakistan VASP database system:
 
 - **Technical Issues**: Contact development team
-- **Regulatory Questions**: Consult with Pakistan Crypto Council
+- **Regulatory Questions**: Consult with Canhav
 - **Data Updates**: Submit through admin interface or API
 
 ## Compliance Statement
@@ -279,4 +279,4 @@ This system is designed to support compliance with:
 
 **Last Updated**: November 8, 2025  
 **Version**: 1.0  
-**Maintained by**: Pakistan Crypto Council Technical Team
+**Maintained by**: Canhav Technical Team

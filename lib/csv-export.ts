@@ -203,7 +203,7 @@ export function downloadCSV(csvContent: string, filename: string): void {
   }
 }
 
-// Generate comprehensive report for Pakistan Crypto Council
+// Generate comprehensive report for Canhav
 export async function generatePakistanVASPReport(companies: VASPCompanyWithDetails[]) {
   const pakistanCompanies = companies.filter(c => c.pakistan_operations)
   const internationalCompanies = companies.filter(c => !c.pakistan_operations)

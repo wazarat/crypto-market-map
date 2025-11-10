@@ -64,12 +64,14 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="bg-indigo-600 rounded-full p-3">
-              <Building2 className="h-8 w-8 text-white" />
-            </div>
+            <img 
+              src="/images/canhav-icon.svg" 
+              alt="Canhav" 
+              className="w-16 h-16"
+            />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
-            Pakistan Crypto Council
+            Canhav
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to access the VASP database

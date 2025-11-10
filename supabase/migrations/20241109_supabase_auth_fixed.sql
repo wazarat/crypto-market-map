@@ -1,4 +1,4 @@
--- Supabase Auth Integration for Pakistan Crypto Council (FIXED VERSION)
+-- Supabase Auth Integration for Canhav (FIXED VERSION)
 -- This uses Supabase's built-in authentication with custom user profiles
 
 -- Create user profiles table (extends Supabase auth.users)

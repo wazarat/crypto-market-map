@@ -1,6 +1,6 @@
 -- ============================================================================
 -- PAKISTAN VASP DATABASE SETUP
--- Complete schema for Pakistan Crypto Council - PVARA Regulations 2025
+-- Complete schema for Canhav - PVARA Regulations 2025
 -- Run this in your Supabase SQL Editor
 -- ============================================================================
 

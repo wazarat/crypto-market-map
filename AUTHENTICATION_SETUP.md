@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Pakistan Crypto Council platform now includes a comprehensive authentication system with the following features:
+The Canhav platform now includes a comprehensive authentication system with the following features:
 
 - **User Registration**: New users can sign up but require admin approval
 - **Admin Approval Workflow**: All new registrations must be approved by admin

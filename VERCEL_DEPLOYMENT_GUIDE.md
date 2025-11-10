@@ -54,7 +54,7 @@ npx vercel --prod
 ### **Enhanced Features with Supabase:**
 - ✅ **Real Pakistan VASP data** instead of mock data
 - ✅ **Regulatory compliance tracking** (PVARA licenses)
-- ✅ **Admin dashboard** for Pakistan Crypto Council
+- ✅ **Admin dashboard** for Canhav
 - ✅ **CSV export** for regulatory reporting
 - ✅ **Advanced filtering** and search
 - ✅ **Real-time updates** and data management

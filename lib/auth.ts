@@ -1,4 +1,4 @@
-// Authentication System for Pakistan Crypto Council
+// Authentication System for Canhav
 import bcrypt from 'bcryptjs'
 import { supabase } from './supabase'
 import { v4 as uuidv4 } from 'uuid'

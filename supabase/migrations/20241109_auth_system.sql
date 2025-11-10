@@ -1,4 +1,4 @@
--- Authentication System for Pakistan Crypto Council
+-- Authentication System for Canhav
 -- Created: 2024-11-09
 
 -- Create users table for custom authentication
