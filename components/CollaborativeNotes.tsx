@@ -47,9 +47,9 @@ export default function CollaborativeNotes({ companyId, companyName }: Collabora
 
   // Mock current user - replace with real auth
   const currentUser = {
-    id: '550e8400-e29b-41d4-a716-446655440000',
-    name: 'Current User',
-    email: 'user@canhav.com'
+    id: '4', // Match the wazarat user ID from the users list
+    name: 'wazarat',
+    email: 'waz@canhav.com'
   }
 
   useEffect(() => {
