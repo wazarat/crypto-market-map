@@ -26,6 +26,7 @@ interface CompanyData {
   employee_count?: number | null
   private_company?: boolean
   public_company?: boolean
+  ticker_symbol?: string
   key_partnerships?: string[]
   company_description?: string
   company_overview?: string
@@ -184,6 +185,7 @@ export default function BulkUploadPage() {
             employee_count: company.employee_count,
             private_company: company.private_company || false,
             public_company: company.public_company || false,
+            ticker_symbol: company.ticker_symbol || '',
             key_partnerships: company.key_partnerships || [],
             company_description: company.company_description || '',
             company_overview: company.company_overview || '',

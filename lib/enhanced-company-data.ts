@@ -21,6 +21,7 @@ export interface BaseCompany {
   employee_count: number | null
   private_company: boolean | null
   public_company: boolean | null
+  ticker_symbol: string | null
   
   // Business Information
   key_partnerships: string[]
@@ -163,6 +164,7 @@ export const enhancedCompanyData: BaseCompany[] = [
     employee_count: 150,
     private_company: true, // Tez is a private company
     public_company: false,
+    ticker_symbol: null, // Private company, no ticker
     key_partnerships: ['Telenor Pakistan', 'State Bank of Pakistan', 'Various Banks'],
     company_description: 'Leading mobile financial services provider in Pakistan offering digital payments and remittance services.',
     company_overview: 'Tez Financial Services is Pakistan\'s leading mobile financial services provider, offering comprehensive digital payment solutions including P2P transfers, bill payments, merchant payments, and international remittances through a secure mobile wallet platform.',

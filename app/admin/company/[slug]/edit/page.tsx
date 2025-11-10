@@ -25,6 +25,7 @@ interface CompanyFormData {
   employee_count: number | null
   private_company: boolean
   public_company: boolean
+  ticker_symbol: string
   key_partnerships: string[]
   company_description: string
   company_overview: string
@@ -84,6 +85,7 @@ export default function EditCompanyPage() {
         employee_count: companyData.employee_count,
         private_company: companyData.private_company || false,
         public_company: companyData.public_company || false,
+        ticker_symbol: companyData.ticker_symbol || '',
         key_partnerships: companyData.key_partnerships || [],
         company_description: companyData.company_description || '',
         company_overview: companyData.company_overview || '',

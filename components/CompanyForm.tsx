@@ -24,6 +24,7 @@ interface CompanyFormData {
   employee_count: number | null
   private_company: boolean
   public_company: boolean
+  ticker_symbol: string
   key_partnerships: string[]
   company_description: string
   company_overview: string
@@ -88,6 +89,7 @@ export default function CompanyForm({ initialData, onSave, onCancel, isEditing =
     employee_count: null,
     private_company: false,
     public_company: false,
+    ticker_symbol: '',
     key_partnerships: [],
     company_description: '',
     company_overview: '',
@@ -451,6 +453,26 @@ export default function CompanyForm({ initialData, onSave, onCancel, isEditing =
                   <span className="text-sm text-gray-700">Public Company (Publicly Traded)</span>
                 </label>
               </div>
+              
+              {/* Ticker Symbol - only show if public company */}
+              {formData.public_company && (
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stock Ticker Symbol
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.ticker_symbol}
+                    onChange={(e) => handleInputChange('ticker_symbol', e.target.value.toUpperCase())}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g., COIN, HOOD"
+                    maxLength={10}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter the stock ticker symbol for publicly traded companies
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

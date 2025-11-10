@@ -12,6 +12,9 @@ import { CompanyDetail, ResearchEntry } from '../../../lib/api'
 import { supabase, UserNote } from '../../../lib/supabase'
 import { vaspApiClient } from '../../../lib/vasp-api'
 import SectorSpecificSections from '../../../components/SectorSpecificSections'
+import TradingViewChart from '../../../components/TradingViewChart'
+import ResearchFeed from '../../../components/ResearchFeed'
+import CollaborativeNotes from '../../../components/CollaborativeNotes'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
 import ChatbaseWidgetAlternative from '../../../components/ChatbaseWidgetAlternative'
 import ChatbaseWidgetSimple from '../../../components/ChatbaseWidgetSimple'
@@ -439,6 +442,16 @@ function CompanyPage() {
                 </div>
               </div>
 
+              {/* TradingView Chart for Public Companies */}
+              {company.public_company && company.ticker_symbol && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <TradingViewChart 
+                    symbol={company.ticker_symbol} 
+                    companyName={company.name}
+                  />
+                </div>
+              )}
+
               {/* Company Description */}
               {(company.company_description || company.company_overview) && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
@@ -548,63 +561,16 @@ function CompanyPage() {
               </div>
             )}
 
-            {/* Research Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Research & Analysis</h2>
-              
-              {research.length > 0 ? (
-                <div className="space-y-6">
-                  {research.map((entry) => (
-                    <ResearchCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No research data available yet.</p>
-                </div>
-              )}
-            </div>
+            {/* Research Feed */}
+            <ResearchFeed companySlug={slug} />
           </div>
 
-          {/* Right Column - User Notes */}
+          {/* Right Column - Collaborative Notes */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">My Notes</h2>
-              
-              {/* Add New Note */}
-              <div className="mb-6">
-                <textarea
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Add your notes about this company..."
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                  rows={4}
-                />
-                <button
-                  onClick={addNote}
-                  disabled={!newNote.trim() || savingNote}
-                  className="mt-3 w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {savingNote ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Plus className="h-4 w-4 mr-2" />
-                  )}
-                  Save Note
-                </button>
-              </div>
-
-              {/* Existing Notes */}
-              <div className="space-y-4">
-                {notes.length > 0 ? (
-                  notes.map((note) => (
-                    <NoteCard key={note.id} note={note} onDelete={deleteNote} />
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-sm">No notes yet. Add your first note above!</p>
-                )}
-              </div>
-            </div>
+            <CollaborativeNotes 
+              companyId={company.id} 
+              companyName={company.name}
+            />
           </div>
         </div>
       </main>

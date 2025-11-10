@@ -25,6 +25,7 @@ interface CompanyFormData {
   employee_count: number | null
   private_company: boolean
   public_company: boolean
+  ticker_symbol: string
   key_partnerships: string[]
   company_description: string
   company_overview: string
