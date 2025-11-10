@@ -330,28 +330,40 @@ class VASPApiClient {
   async updateCompanySectors(companyId: string, sectorSlugs: string[]): Promise<void> {
     const client = this.ensureSupabase()
     
+    console.log('🔧 updateCompanySectors called with:', { companyId, sectorSlugs })
+    
     try {
       // First, get category IDs from slugs
+      console.log('📋 Fetching category IDs for slugs:', sectorSlugs)
       const { data: categories, error: categoryError } = await client
         .from('vasp_categories')
         .select('id, slug')
         .in('slug', sectorSlugs)
       
-      if (categoryError) throw categoryError
+      if (categoryError) {
+        console.error('❌ Error fetching categories:', categoryError)
+        throw categoryError
+      }
       
-      // Delete existing sector assignments
+      console.log('✅ Found categories:', categories)
+      
+      // Delete existing sector assignments for this company
+      console.log('🗑️ Deleting existing assignments for company:', companyId)
       const { error: deleteError } = await client
         .from('company_sectors')
         .delete()
         .eq('company_id', companyId)
       
       if (deleteError) {
+        console.error('❌ Error deleting existing assignments:', deleteError)
         // If company_sectors table doesn't exist, throw specific error
         if (deleteError.code === 'PGRST204' || deleteError.message?.includes('company_sectors')) {
           throw new Error('MIGRATION_REQUIRED: company_sectors table does not exist')
         }
         throw deleteError
       }
+      
+      console.log('✅ Deleted existing assignments')
       
       // Insert new sector assignments
       if (categories && categories.length > 0) {
@@ -360,13 +372,28 @@ class VASPApiClient {
           category_id: category.id
         }))
         
-        const { error: insertError } = await client
+        console.log('➕ Inserting new assignments:', sectorAssignments)
+        
+        const { data: insertData, error: insertError } = await client
           .from('company_sectors')
           .insert(sectorAssignments)
+          .select()
         
-        if (insertError) throw insertError
+        if (insertError) {
+          console.error('❌ Error inserting new assignments:', insertError)
+          throw insertError
+        }
+        
+        console.log('✅ Successfully inserted assignments:', insertData)
+      } else {
+        console.log('⚠️ No categories found for the provided slugs')
       }
+      
+      console.log('🎉 updateCompanySectors completed successfully')
+      
     } catch (error: any) {
+      console.error('💥 updateCompanySectors failed:', error)
+      
       // If it's a migration-related error, throw it to trigger fallback
       if (error.message?.includes('MIGRATION_REQUIRED') || 
           error.code === 'PGRST204' || 
