@@ -463,13 +463,18 @@ export default function CompanyForm({ initialData, onSave, onCancel, isEditing =
                   <input
                     type="text"
                     value={formData.ticker_symbol}
-                    onChange={(e) => handleInputChange('ticker_symbol', e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      // Remove any exchange prefixes and convert to uppercase
+                      let value = e.target.value.toUpperCase()
+                      value = value.replace(/^(NASDAQ:|NYSE:|NYSE:|TSX:)/, '')
+                      handleInputChange('ticker_symbol', value)
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., COIN, HOOD"
+                    placeholder="e.g., COIN, HOOD, SQ"
                     maxLength={10}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Enter the stock ticker symbol for publicly traded companies
+                    Enter only the ticker symbol (e.g., COIN). Do not include exchange prefix.
                   </p>
                 </div>
               )}

@@ -44,6 +44,26 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
     }
   }, [symbol])
 
+  const getFullSymbol = (ticker: string) => {
+    // Clean the ticker symbol
+    const cleanTicker = ticker.toUpperCase().replace(/^(NASDAQ:|NYSE:|TSX:)/, '')
+    
+    // Map common crypto/fintech companies to their exchanges
+    const exchangeMap: Record<string, string> = {
+      'COIN': 'NASDAQ:COIN',
+      'HOOD': 'NASDAQ:HOOD',
+      'SQ': 'NYSE:SQ',
+      'PYPL': 'NASDAQ:PYPL',
+      'V': 'NYSE:V',
+      'MA': 'NYSE:MA',
+      'MSTR': 'NASDAQ:MSTR',
+      'TSLA': 'NASDAQ:TSLA'
+    }
+    
+    // Return mapped symbol or default to NASDAQ
+    return exchangeMap[cleanTicker] || `NASDAQ:${cleanTicker}`
+  }
+
   const initializeWidget = () => {
     if (!containerRef.current || !window.TradingView) return
 
@@ -53,9 +73,12 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
     }
 
     try {
+      const fullSymbol = getFullSymbol(symbol)
+      console.log('Loading TradingView chart for:', fullSymbol)
+      
       widgetRef.current = new window.TradingView.widget({
         autosize: true,
-        symbol: `NASDAQ:${symbol}`,
+        symbol: fullSymbol,
         interval: 'D',
         timezone: 'Etc/UTC',
         theme: 'light',
@@ -63,7 +86,7 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
         locale: 'en',
         toolbar_bg: '#f1f3f6',
         enable_publishing: false,
-        allow_symbol_change: false,
+        allow_symbol_change: true, // Allow users to change symbol
         container_id: containerRef.current.id,
         hide_top_toolbar: false,
         hide_legend: false,
@@ -73,10 +96,25 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
         ],
         show_popup_button: true,
         popup_width: '1000',
-        popup_height: '650'
+        popup_height: '650',
+        // Add error handling
+        onChartReady: () => {
+          console.log('TradingView chart loaded successfully for', fullSymbol)
+        }
       })
     } catch (error) {
       console.error('TradingView widget initialization error:', error)
+      // Show error message in the container
+      if (containerRef.current) {
+        containerRef.current.innerHTML = `
+          <div class="flex items-center justify-center h-full bg-red-50 rounded-lg">
+            <div class="text-center">
+              <p class="text-red-600 font-medium">Chart Loading Error</p>
+              <p class="text-red-500 text-sm">Unable to load chart for ${symbol}</p>
+            </div>
+          </div>
+        `
+      }
     }
   }
 
@@ -93,7 +131,7 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
           </span>
         </div>
         <a
-          href={`https://www.tradingview.com/chart/?symbol=NASDAQ:${symbol}`}
+          href={`https://www.tradingview.com/chart/?symbol=${getFullSymbol(symbol)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center text-sm text-blue-600 hover:text-blue-700"
