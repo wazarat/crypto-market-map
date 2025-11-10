@@ -19,20 +19,36 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
   const widgetRef = useRef<any>(null)
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
     // Load TradingView script if not already loaded
     if (!window.TradingView) {
       const script = document.createElement('script')
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
       script.async = true
       script.onload = () => {
-        initializeWidget()
+        // Add a small delay to ensure TradingView is fully loaded
+        timeoutId = setTimeout(() => {
+          initializeWidget()
+        }, 1000)
+      }
+      script.onerror = () => {
+        console.error('Failed to load TradingView script')
+        showErrorMessage('Failed to load TradingView. Please check your internet connection.')
       }
       document.head.appendChild(script)
     } else {
-      initializeWidget()
+      // TradingView already loaded, initialize with delay
+      timeoutId = setTimeout(() => {
+        initializeWidget()
+      }, 500)
     }
 
     return () => {
+      // Clear timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
       // Cleanup widget on unmount
       if (widgetRef.current) {
         try {
@@ -43,6 +59,22 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
       }
     }
   }, [symbol])
+
+  const showErrorMessage = (message: string) => {
+    if (containerRef.current) {
+      containerRef.current.innerHTML = `
+        <div class="flex items-center justify-center h-full bg-red-50 rounded-lg">
+          <div class="text-center">
+            <p class="text-red-600 font-medium">Chart Loading Error</p>
+            <p class="text-red-500 text-sm">${message}</p>
+            <button onclick="window.location.reload()" class="mt-2 px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+              Retry
+            </button>
+          </div>
+        </div>
+      `
+    }
+  }
 
   const getFullSymbol = (ticker: string) => {
     // Clean the ticker symbol
@@ -65,7 +97,10 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
   }
 
   const initializeWidget = () => {
-    if (!containerRef.current || !window.TradingView) return
+    if (!containerRef.current || !window.TradingView) {
+      console.log('TradingView not ready:', { container: !!containerRef.current, TradingView: !!window.TradingView })
+      return
+    }
 
     // Clear existing widget
     if (containerRef.current) {
@@ -75,6 +110,18 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
     try {
       const fullSymbol = getFullSymbol(symbol)
       console.log('Loading TradingView chart for:', fullSymbol)
+      
+      // Create unique container ID
+      const containerId = `tradingview-widget-${symbol}-${Date.now()}`
+      if (containerRef.current) {
+        containerRef.current.id = containerId
+      }
+      
+      // Set loading timeout - if chart doesn't load in 15 seconds, show error
+      const loadingTimeout = setTimeout(() => {
+        console.error('TradingView chart loading timeout')
+        showErrorMessage(`Chart loading timeout for ${symbol}. The symbol might not exist or TradingView is unavailable.`)
+      }, 15000)
       
       widgetRef.current = new window.TradingView.widget({
         autosize: true,
@@ -86,8 +133,8 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
         locale: 'en',
         toolbar_bg: '#f1f3f6',
         enable_publishing: false,
-        allow_symbol_change: true, // Allow users to change symbol
-        container_id: containerRef.current.id,
+        allow_symbol_change: true,
+        container_id: containerId,
         hide_top_toolbar: false,
         hide_legend: false,
         save_image: false,
@@ -97,24 +144,14 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
         show_popup_button: true,
         popup_width: '1000',
         popup_height: '650',
-        // Add error handling
         onChartReady: () => {
+          clearTimeout(loadingTimeout)
           console.log('TradingView chart loaded successfully for', fullSymbol)
         }
       })
     } catch (error) {
       console.error('TradingView widget initialization error:', error)
-      // Show error message in the container
-      if (containerRef.current) {
-        containerRef.current.innerHTML = `
-          <div class="flex items-center justify-center h-full bg-red-50 rounded-lg">
-            <div class="text-center">
-              <p class="text-red-600 font-medium">Chart Loading Error</p>
-              <p class="text-red-500 text-sm">Unable to load chart for ${symbol}</p>
-            </div>
-          </div>
-        `
-      }
+      showErrorMessage(`Unable to load chart for ${symbol}. Error: ${error}`)
     }
   }
 
@@ -144,7 +181,6 @@ export default function TradingViewChart({ symbol, companyName }: TradingViewCha
       <div className="relative">
         <div 
           ref={containerRef}
-          id={`tradingview-widget-${symbol}`}
           className="w-full h-96 bg-gray-50 rounded-lg"
         >
           {/* Loading state */}

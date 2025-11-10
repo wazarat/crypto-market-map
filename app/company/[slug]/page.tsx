@@ -13,6 +13,7 @@ import { supabase, UserNote } from '../../../lib/supabase'
 import { vaspApiClient } from '../../../lib/vasp-api'
 import SectorSpecificSections from '../../../components/SectorSpecificSections'
 import TradingViewChart from '../../../components/TradingViewChart'
+import TradingViewChartSimple from '../../../components/TradingViewChartSimple'
 import ResearchFeed from '../../../components/ResearchFeed'
 import CollaborativeNotes from '../../../components/CollaborativeNotes'
 import ChatbaseWidget from '../../../components/ChatbaseWidget'
@@ -445,7 +446,7 @@ function CompanyPage() {
               {/* TradingView Chart for Public Companies */}
               {company.public_company && company.ticker_symbol && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <TradingViewChart 
+                  <TradingViewChartSimple 
                     symbol={company.ticker_symbol} 
                     companyName={company.name}
                   />
