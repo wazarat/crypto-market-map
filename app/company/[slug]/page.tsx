@@ -60,8 +60,17 @@ function CompanyPage() {
         if (companyData && unifiedApiClient.hasVASPFeatures()) {
           try {
             const vaspCompany = await vaspApiClient.getCompanyBySlug(slug)
-            if (vaspCompany?.sector_details) {
-              setSectorSpecificData(vaspCompany.sector_details)
+            if (vaspCompany) {
+              // Update company with sectors information
+              setCompany({
+                ...companyData,
+                sectors: vaspCompany.sectors || [vaspCompany.category?.slug].filter(Boolean)
+              })
+              
+              // Set sector-specific data
+              if (vaspCompany.sector_details) {
+                setSectorSpecificData(vaspCompany.sector_details)
+              }
             }
           } catch (err) {
             console.log('No sector-specific data found:', err)
