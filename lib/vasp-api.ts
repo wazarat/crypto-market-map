@@ -486,6 +486,90 @@ class VASPApiClient {
       search: searchTerm
     })
   }
+
+  // Save sector-specific data
+  async saveSectorSpecificData(companyId: string, sectorSlug: string, sectorData: any) {
+    const client = this.ensureSupabase()
+    
+    // Determine which table to update based on sector slug
+    let tableName: string
+    switch (sectorSlug) {
+      case 'advisory-services':
+        tableName = 'advisory_services_details'
+        break
+      case 'broker-dealer-services':
+        tableName = 'broker_dealer_details'
+        break
+      case 'custody-services':
+        tableName = 'custody_services_details'
+        break
+      case 'exchange-services':
+        tableName = 'exchange_services_details'
+        break
+      case 'lending-borrowing':
+        tableName = 'lending_borrowing_details'
+        break
+      case 'derivatives':
+        tableName = 'derivatives_details'
+        break
+      case 'asset-management':
+        tableName = 'asset_management_details'
+        break
+      case 'transfer-settlement':
+        tableName = 'transfer_settlement_details'
+        break
+      case 'fiat-tokens':
+        tableName = 'fiat_referenced_token_details'
+        break
+      case 'asset-tokens':
+        tableName = 'asset_referenced_token_details'
+        break
+      default:
+        throw new Error(`Unknown sector slug: ${sectorSlug}`)
+    }
+
+    // Prepare data for database (remove any UI-only fields)
+    const cleanedData = { ...sectorData }
+    delete cleanedData.id
+    delete cleanedData.created_at
+    delete cleanedData.updated_at
+
+    // Try to update existing record, if not found then insert
+    const { data: existingData } = await client
+      .from(tableName)
+      .select('id')
+      .eq('company_id', companyId)
+      .single()
+
+    if (existingData) {
+      // Update existing record
+      const { data, error } = await client
+        .from(tableName)
+        .update({
+          ...cleanedData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('company_id', companyId)
+        .select()
+
+      if (error) throw error
+      return data
+    } else {
+      // Insert new record
+      const { data, error } = await client
+        .from(tableName)
+        .insert({
+          company_id: companyId,
+          ...cleanedData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+
+      if (error) throw error
+      return data
+    }
+  }
 }
 
 export const vaspApiClient = new VASPApiClient()

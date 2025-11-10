@@ -189,18 +189,38 @@ function CompanyPage() {
 
     setSaving(true)
     try {
-      // Save sector-specific data for each sector
+      // Save sector-specific data for each sector using VASP API
       for (const sectorSlug of company.sectors || []) {
         const sectorData = sectorSpecificData[sectorSlug]
         if (sectorData && Object.keys(sectorData).length > 0) {
-          // In a real implementation, you would call the appropriate API endpoint
-          // based on the sector type to save the sector-specific data
           console.log(`Saving ${sectorSlug} data for company ${company.id}:`, sectorData)
+          
+          // Call the appropriate save method based on sector type
+          if (unifiedApiClient.hasVASPFeatures()) {
+            try {
+              await vaspApiClient.saveSectorSpecificData(company.id, sectorSlug, sectorData)
+              console.log(`Successfully saved ${sectorSlug} data`)
+            } catch (saveError) {
+              console.error(`Error saving ${sectorSlug} data:`, saveError)
+              // Continue with other sectors even if one fails
+            }
+          }
         }
       }
 
       setIsEditing(false)
-      // Show success message or refresh data
+      
+      // Refresh the data to show the saved changes
+      if (unifiedApiClient.hasVASPFeatures()) {
+        try {
+          const vaspCompany = await vaspApiClient.getCompanyBySlug(slug)
+          if (vaspCompany?.sector_details) {
+            setSectorSpecificData(vaspCompany.sector_details)
+          }
+        } catch (refreshError) {
+          console.error('Error refreshing data:', refreshError)
+        }
+      }
     } catch (err) {
       console.error('Error saving sector data:', err)
     } finally {
