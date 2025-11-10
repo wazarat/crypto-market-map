@@ -138,18 +138,33 @@ export default function EditCompanyPage() {
             console.log('✅ Sectors updated successfully')
           } else {
             console.warn('⚠️ updateCompanySectors method not available, using fallback')
+            throw new Error('Method not available')
+          }
+        } catch (sectorError: any) {
+          console.error('❌ Error updating sectors:', sectorError)
+          
+          // Check if it's a migration-required error or method not available
+          if (sectorError.message?.includes('MIGRATION_REQUIRED') || 
+              sectorError.message?.includes('company_sectors') ||
+              sectorError.message?.includes('Method not available') ||
+              sectorError.code === 'PGRST204') {
+            
+            console.warn('⚠️ Many-to-many sectors not available, using legacy single-category fallback')
+            
             // Fallback: Update the main category to the first selected sector
             if (data.sectors.length > 0) {
-              const sectors = await vaspApiClient.getCategories()
-              const firstSector = sectors.find(s => s.slug === data.sectors[0])
-              if (firstSector) {
-                await vaspApiClient.updateCompany(company.id, { category_id: firstSector.id })
-                console.log('✅ Updated main category as fallback')
+              try {
+                const sectors = await vaspApiClient.getCategories()
+                const firstSector = sectors.find(s => s.slug === data.sectors[0])
+                if (firstSector) {
+                  await vaspApiClient.updateCompany(company.id, { category_id: firstSector.id })
+                  console.log('✅ Updated main category as fallback:', firstSector.slug)
+                }
+              } catch (fallbackError) {
+                console.error('❌ Fallback also failed:', fallbackError)
               }
             }
           }
-        } catch (sectorError) {
-          console.error('❌ Error updating sectors:', sectorError)
           // Don't throw - let the main save succeed even if sector update fails
         }
       }

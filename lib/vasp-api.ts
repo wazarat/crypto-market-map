@@ -330,34 +330,50 @@ class VASPApiClient {
   async updateCompanySectors(companyId: string, sectorSlugs: string[]): Promise<void> {
     const client = this.ensureSupabase()
     
-    // First, get category IDs from slugs
-    const { data: categories, error: categoryError } = await client
-      .from('vasp_categories')
-      .select('id, slug')
-      .in('slug', sectorSlugs)
-    
-    if (categoryError) throw categoryError
-    
-    // Delete existing sector assignments
-    const { error: deleteError } = await client
-      .from('company_sectors')
-      .delete()
-      .eq('company_id', companyId)
-    
-    if (deleteError) throw deleteError
-    
-    // Insert new sector assignments
-    if (categories && categories.length > 0) {
-      const sectorAssignments = categories.map(category => ({
-        company_id: companyId,
-        category_id: category.id
-      }))
+    try {
+      // First, get category IDs from slugs
+      const { data: categories, error: categoryError } = await client
+        .from('vasp_categories')
+        .select('id, slug')
+        .in('slug', sectorSlugs)
       
-      const { error: insertError } = await client
+      if (categoryError) throw categoryError
+      
+      // Delete existing sector assignments
+      const { error: deleteError } = await client
         .from('company_sectors')
-        .insert(sectorAssignments)
+        .delete()
+        .eq('company_id', companyId)
       
-      if (insertError) throw insertError
+      if (deleteError) {
+        // If company_sectors table doesn't exist, throw specific error
+        if (deleteError.code === 'PGRST204' || deleteError.message?.includes('company_sectors')) {
+          throw new Error('MIGRATION_REQUIRED: company_sectors table does not exist')
+        }
+        throw deleteError
+      }
+      
+      // Insert new sector assignments
+      if (categories && categories.length > 0) {
+        const sectorAssignments = categories.map(category => ({
+          company_id: companyId,
+          category_id: category.id
+        }))
+        
+        const { error: insertError } = await client
+          .from('company_sectors')
+          .insert(sectorAssignments)
+        
+        if (insertError) throw insertError
+      }
+    } catch (error: any) {
+      // If it's a migration-related error, throw it to trigger fallback
+      if (error.message?.includes('MIGRATION_REQUIRED') || 
+          error.code === 'PGRST204' || 
+          error.message?.includes('company_sectors')) {
+        throw new Error('MIGRATION_REQUIRED: company_sectors table does not exist')
+      }
+      throw error
     }
   }
 
