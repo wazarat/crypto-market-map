@@ -44,6 +44,7 @@ function CompanyPage() {
   const [sectorSpecificData, setSectorSpecificData] = useState<any>({})
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [activeSectorTab, setActiveSectorTab] = useState<string>('')
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -62,10 +63,16 @@ function CompanyPage() {
             const vaspCompany = await vaspApiClient.getCompanyBySlug(slug)
             if (vaspCompany) {
               // Update company with sectors information
+              const sectors = vaspCompany.sectors || [vaspCompany.category?.slug].filter(Boolean)
               setCompany({
                 ...companyData,
-                sectors: vaspCompany.sectors || [vaspCompany.category?.slug].filter(Boolean)
+                sectors: sectors
               })
+              
+              // Set first sector as active tab
+              if (sectors.length > 0 && !activeSectorTab) {
+                setActiveSectorTab(sectors[0])
+              }
               
               // Set sector-specific data
               if (vaspCompany.sector_details) {
@@ -530,42 +537,71 @@ function CompanyPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {company.sectors.map((sectorSlug: string) => {
-                      const sectorData = sectorSpecificData[sectorSlug]
-                      if (!sectorData || Object.keys(sectorData).length === 0) {
-                        return (
-                          <div key={sectorSlug} className="p-4 bg-gray-50 rounded-lg">
-                            <h3 className="font-medium text-gray-900 mb-2 capitalize">
-                              {sectorSlug.replace('-', ' ')} Details
-                            </h3>
-                            <p className="text-gray-500 text-sm">
-                              No sector-specific details available. Click "Edit" to add information.
-                            </p>
-                          </div>
-                        )
-                      }
+                  <div>
+                    {/* Sector Tabs */}
+                    <div className="border-b border-gray-200 mb-6">
+                      <nav className="-mb-px flex space-x-8">
+                        {company.sectors.map((sectorSlug: string) => (
+                          <button
+                            key={sectorSlug}
+                            onClick={() => setActiveSectorTab(sectorSlug)}
+                            className={`py-2 px-1 border-b-2 font-medium text-sm capitalize ${
+                              activeSectorTab === sectorSlug
+                                ? 'border-indigo-500 text-indigo-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            }`}
+                          >
+                            {sectorSlug.replace('-', ' ')}
+                          </button>
+                        ))}
+                      </nav>
+                    </div>
 
-                      return (
-                        <div key={sectorSlug} className="p-4 bg-gray-50 rounded-lg">
-                          <h3 className="font-medium text-gray-900 mb-3 capitalize">
-                            {sectorSlug.replace('-', ' ')} Details
-                          </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {Object.entries(sectorData).map(([key, value]) => (
-                              <div key={key} className="flex justify-between">
-                                <span className="text-gray-500 capitalize">
-                                  {key.replace(/_/g, ' ')}:
-                                </span>
-                                <span className="text-gray-900">
-                                  {Array.isArray(value) ? value.join(', ') : String(value)}
-                                </span>
+                    {/* Active Sector Content */}
+                    {activeSectorTab && (
+                      <div>
+                        {(() => {
+                          const sectorData = sectorSpecificData[activeSectorTab]
+                          if (!sectorData || Object.keys(sectorData).length === 0) {
+                            return (
+                              <div className="p-6 bg-gray-50 rounded-lg text-center">
+                                <h3 className="font-medium text-gray-900 mb-2 capitalize">
+                                  {activeSectorTab.replace('-', ' ')} Details
+                                </h3>
+                                <p className="text-gray-500 text-sm">
+                                  No sector-specific details available. Click "Edit" to add information.
+                                </p>
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      )
-                    })}
+                            )
+                          }
+
+                          // Filter out id and company_id fields
+                          const filteredData = Object.entries(sectorData).filter(([key]) => 
+                            key !== 'id' && key !== 'company_id' && key !== 'created_at' && key !== 'updated_at'
+                          )
+
+                          return (
+                            <div className="p-6 bg-gray-50 rounded-lg">
+                              <h3 className="font-medium text-gray-900 mb-4 capitalize">
+                                {activeSectorTab.replace('-', ' ')} Details
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {filteredData.map(([key, value]) => (
+                                  <div key={key} className="flex flex-col">
+                                    <span className="text-gray-500 text-sm font-medium capitalize mb-1">
+                                      {key.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="text-gray-900">
+                                      {Array.isArray(value) ? value.join(', ') : String(value)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
