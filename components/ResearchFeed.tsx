@@ -46,7 +46,7 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
     title: '',
     description: '',
     submitterName: '',
-    submitterEmail: '',
+    department: '',
     file: null as File | null,
     link: '',
     linkType: 'article' as 'article' | 'report' | 'analysis' | 'news' | 'other'
@@ -90,7 +90,7 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
         formData.append('title', uploadForm.title)
         formData.append('description', uploadForm.description)
         formData.append('submitterName', uploadForm.submitterName)
-        formData.append('submitterEmail', uploadForm.submitterEmail)
+        formData.append('department', uploadForm.department)
         formData.append('companySlug', companySlug)
         formData.append('type', 'file')
 
@@ -106,7 +106,7 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
           title: uploadForm.title,
           description: uploadForm.description,
           submitterName: uploadForm.submitterName,
-          submitterEmail: uploadForm.submitterEmail,
+          department: uploadForm.department,
           companySlug: companySlug,
           link: uploadForm.link,
           linkType: uploadForm.linkType,
@@ -127,7 +127,7 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
         title: '',
         description: '',
         submitterName: '',
-        submitterEmail: '',
+        department: '',
         file: null,
         link: '',
         linkType: 'article'
@@ -252,15 +252,20 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email (optional)
+                Department
               </label>
-              <input
-                type="email"
-                value={uploadForm.submitterEmail}
-                onChange={(e) => setUploadForm(prev => ({ ...prev, submitterEmail: e.target.value }))}
+              <select
+                value={uploadForm.department}
+                onChange={(e) => setUploadForm(prev => ({ ...prev, department: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="your.email@example.com"
-              />
+              >
+                <option value="">Select Department</option>
+                <option value="Pakistan Crypto Council">Pakistan Crypto Council</option>
+                <option value="Securities and Exchange Commission of Pakistan">Securities and Exchange Commission of Pakistan</option>
+                <option value="State Bank of Pakistan">State Bank of Pakistan</option>
+                <option value="Other (Federal Govt Employees)">Other (Federal Govt Employees)</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
             {/* Upload Type Toggle */}
