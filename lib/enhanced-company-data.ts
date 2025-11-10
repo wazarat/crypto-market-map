@@ -19,7 +19,8 @@ export interface BaseCompany {
   point_of_contact_email: string | null
   point_of_contact_phone: string | null
   employee_count: number | null
-  total_funding_pkr: number | null
+  private_company: boolean | null
+  public_company: boolean | null
   
   // Business Information
   key_partnerships: string[]
@@ -160,7 +161,8 @@ export const enhancedCompanyData: BaseCompany[] = [
     point_of_contact_email: 'business@tez.pk',
     point_of_contact_phone: '+92-51-111-345-100',
     employee_count: 150,
-    total_funding_pkr: 2500000000, // 2.5 billion PKR
+    private_company: true, // Tez is a private company
+    public_company: false,
     key_partnerships: ['Telenor Pakistan', 'State Bank of Pakistan', 'Various Banks'],
     company_description: 'Leading mobile financial services provider in Pakistan offering digital payments and remittance services.',
     company_overview: 'Tez Financial Services is Pakistan\'s leading mobile financial services provider, offering comprehensive digital payment solutions including P2P transfers, bill payments, merchant payments, and international remittances through a secure mobile wallet platform.',
