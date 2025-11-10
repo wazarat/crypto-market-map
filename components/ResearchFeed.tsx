@@ -59,15 +59,19 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
   const fetchResearchItems = async () => {
     try {
       setLoading(true)
-      // TODO: Replace with actual API call
-      // const response = await fetch(`/api/research/${companySlug}`)
-      // const data = await response.json()
-      // setResearchItems(data)
       
-      // No mock data - start with empty research feed
-      setResearchItems([])
+      // Get research items from localStorage for this specific company
+      const storageKey = `research_${companySlug}`
+      const storedItems = localStorage.getItem(storageKey)
+      
+      if (storedItems) {
+        setResearchItems(JSON.parse(storedItems))
+      } else {
+        setResearchItems([])
+      }
     } catch (error) {
       console.error('Error fetching research items:', error)
+      setResearchItems([])
     } finally {
       setLoading(false)
     }
@@ -83,44 +87,34 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
 
     setUploading(true)
     try {
-      if (uploadType === 'file') {
-        // Handle file upload
-        const formData = new FormData()
-        formData.append('file', uploadForm.file!)
-        formData.append('title', uploadForm.title)
-        formData.append('description', uploadForm.description)
-        formData.append('submitterName', uploadForm.submitterName)
-        formData.append('department', uploadForm.department)
-        formData.append('companySlug', companySlug)
-        formData.append('type', 'file')
-
-        // const response = await fetch('/api/research/upload', {
-        //   method: 'POST',
-        //   body: formData
-        // })
-
-        console.log('File upload would happen here:', formData)
-      } else {
-        // Handle link submission
-        const linkData = {
-          title: uploadForm.title,
-          description: uploadForm.description,
-          submitterName: uploadForm.submitterName,
-          department: uploadForm.department,
-          companySlug: companySlug,
-          link: uploadForm.link,
-          linkType: uploadForm.linkType,
-          type: 'link'
-        }
-
-        // const response = await fetch('/api/research/link', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(linkData)
-        // })
-
-        console.log('Link submission would happen here:', linkData)
+      // Create new research item
+      const newItem: ResearchItem = {
+        id: Date.now().toString(),
+        title: uploadForm.title,
+        description: uploadForm.description,
+        file_name: uploadType === 'file' ? uploadForm.file?.name || 'Unknown' : uploadForm.link,
+        file_path: uploadType === 'file' ? '#' : uploadForm.link,
+        file_type: uploadType === 'file' ? uploadForm.file?.type || 'application/pdf' : 'link',
+        file_size_bytes: uploadType === 'file' ? uploadForm.file?.size || 0 : 0,
+        submitted_by_name: uploadForm.submitterName,
+        submitted_by_email: uploadForm.department, // Store department in email field for now
+        created_at: new Date().toISOString(),
+        download_count: 0,
+        comments: []
       }
+
+      // Get existing items for this company
+      const storageKey = `research_${companySlug}`
+      const existingItems = localStorage.getItem(storageKey)
+      const items = existingItems ? JSON.parse(existingItems) : []
+      
+      // Add new item to the beginning
+      items.unshift(newItem)
+      
+      // Save back to localStorage
+      localStorage.setItem(storageKey, JSON.stringify(items))
+      
+      console.log(`Research item saved for ${companySlug}:`, newItem)
       
       // Reset form
       setUploadForm({
@@ -409,10 +403,22 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
                     <span>{item.download_count} downloads</span>
                   </div>
                 </div>
-                <button className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-600 rounded-md hover:bg-blue-50">
-                  <Download className="h-4 w-4 mr-1" />
-                  Download
-                </button>
+                {item.file_type === 'link' ? (
+                  <a 
+                    href={item.file_path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-600 rounded-md hover:bg-blue-50"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Open Link
+                  </a>
+                ) : (
+                  <button className="flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-600 rounded-md hover:bg-blue-50">
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                  </button>
+                )}
               </div>
 
               {/* Comments Section */}

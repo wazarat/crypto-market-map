@@ -86,7 +86,9 @@ export default function CollaborativeNotes({ companyId, companyName }: Collabora
         { id: '1', username: 'admin', display_name: 'Admin User', email: 'admin@canhav.com', is_active: true },
         { id: '2', username: 'researcher', display_name: 'Research Analyst', email: 'research@canhav.com', is_active: true },
         { id: '3', username: 'analyst', display_name: 'Market Analyst', email: 'analyst@canhav.com', is_active: true },
-        { id: '4', username: 'wazarat', display_name: 'Wazarat', email: 'waz@canhav.com', is_active: true }
+        { id: '4', username: 'wazarat', display_name: 'Wazarat', email: 'waz@canhav.com', is_active: true },
+        { id: '5', username: 'najia', display_name: 'Najia', email: 'najia@canhav.com', is_active: true },
+        { id: '6', username: 'talal', display_name: 'Talal', email: 'talal@canhav.com', is_active: true }
       ])
     } catch (error) {
       console.error('Error fetching users:', error)
