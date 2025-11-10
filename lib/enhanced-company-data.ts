@@ -145,39 +145,39 @@ export interface VASPCategory {
 }
 
 // Sample enhanced company data structure
-export const enhancedCompanyData: BaseCompany[] = [
+export const mockVASPCompanies: BaseCompany[] = [
   {
     id: '1',
-    name: 'Tez Financial Services',
-    slug: 'tez-financial',
-    category_id: '8', // Transfer and Settlement
-    sectors: ['transfer-settlement'],
-    year_founded: 2016,
-    founder_ceo_name: 'Telenor Pakistan',
-    headquarters_location: 'Islamabad, Pakistan',
-    pakistan_operations: true,
-    website: 'https://www.telenor.com.pk/tez',
-    contact_email: 'support@tez.pk',
-    contact_phone: '+92-345-0000000',
-    point_of_contact_email: 'business@tez.pk',
-    point_of_contact_phone: '+92-51-111-345-100',
-    employee_count: 150,
-    private_company: true, // Tez is a private company
-    public_company: false,
-    ticker_symbol: null, // Private company, no ticker
-    key_partnerships: ['Telenor Pakistan', 'State Bank of Pakistan', 'Various Banks'],
-    company_description: 'Leading mobile financial services provider in Pakistan offering digital payments and remittance services.',
-    company_overview: 'Tez Financial Services is Pakistan\'s leading mobile financial services provider, offering comprehensive digital payment solutions including P2P transfers, bill payments, merchant payments, and international remittances through a secure mobile wallet platform.',
+    name: 'Coinbase',
+    slug: 'coinbase',
+    category_id: '1', // Exchange Services
+    sectors: ['exchange-services'],
+    year_founded: 2012,
+    founder_ceo_name: 'Brian Armstrong',
+    headquarters_location: 'San Francisco, California, USA',
+    pakistan_operations: false,
+    website: 'https://www.coinbase.com',
+    contact_email: 'support@coinbase.com',
+    contact_phone: 'https://www.coinbase.com',
+    point_of_contact_email: 'business@coinbase.com',
+    point_of_contact_phone: '+1-888-908-7930',
+    employee_count: 3800,
+    private_company: false,
+    public_company: true, // Coinbase is publicly traded
+    ticker_symbol: 'COIN', // NASDAQ: COIN
+    key_partnerships: ['Visa', 'Mastercard', 'PayPal', 'Various Financial Institutions'],
+    company_description: 'Leading cryptocurrency exchange and trading platform in the United States.',
+    company_overview: 'Coinbase is a leading cryptocurrency exchange and trading platform, offering a secure and user-friendly platform for buying, selling, and storing digital assets.',
     logo_url: null,
-    twitter_handle: '@TezPakistan',
-    linkedin_url: 'https://linkedin.com/company/tez-pakistan',
-    social_media_twitter: '@TezPakistan',
-    social_media_linkedin: 'https://linkedin.com/company/tez-pakistan',
-    social_media_facebook: 'https://facebook.com/TezPakistan',
-    secp_registration_number: 'SECP-2016-001',
+    twitter_handle: '@coinbase',
+    linkedin_url: 'https://linkedin.com/company/coinbase',
+    social_media_twitter: '@coinbase',
+    social_media_linkedin: 'https://linkedin.com/company/coinbase',
+    social_media_facebook: 'https://facebook.com/coinbase',
+    secp_registration_number: null,
     pvara_license_number: null,
-    license_status: 'Applied',
-    verification_status: 'Under Review',
+    license_status: 'None',
+    verification_status: 'Verified',
     paid_up_capital_pkr: 1000000000,
     capital_adequacy_ratio: 15.5,
     number_of_directors: 7,

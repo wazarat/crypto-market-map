@@ -61,32 +61,8 @@ export default function ResearchFeed({ companySlug }: ResearchFeedProps) {
       // const data = await response.json()
       // setResearchItems(data)
       
-      // Mock data for now
-      setResearchItems([
-        {
-          id: '1',
-          title: 'Q3 2024 Financial Analysis',
-          description: 'Comprehensive analysis of Q3 financial performance and market position.',
-          file_name: 'coinbase-q3-2024-analysis.pdf',
-          file_path: '/uploads/research/coinbase-q3-2024-analysis.pdf',
-          file_type: 'pdf',
-          file_size_bytes: 2048576,
-          submitted_by_name: 'Research Team',
-          submitted_by_email: 'research@canhav.com',
-          created_at: '2024-11-10T10:00:00Z',
-          download_count: 15,
-          comments: [
-            {
-              id: '1',
-              user_name: 'Market Analyst',
-              comment_text: 'Great analysis! The revenue growth projections look promising. @researcher what do you think about the regulatory risks?',
-              mentioned_users: ['researcher'],
-              created_at: '2024-11-10T11:00:00Z',
-              is_edited: false
-            }
-          ]
-        }
-      ])
+      // No mock data - start with empty research feed
+      setResearchItems([])
     } catch (error) {
       console.error('Error fetching research items:', error)
     } finally {

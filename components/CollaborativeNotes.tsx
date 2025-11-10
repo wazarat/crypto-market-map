@@ -65,33 +65,8 @@ export default function CollaborativeNotes({ companyId, companyName }: Collabora
       // const data = await response.json()
       // setNotes(data)
 
-      // Mock data for now
-      setNotes([
-        {
-          id: '1',
-          user_id: 'user1',
-          user_name: 'Research Analyst',
-          user_email: 'research@canhav.com',
-          note_text: 'Great quarterly results! The revenue growth is impressive. @analyst what are your thoughts on the regulatory outlook?',
-          mentioned_users: ['analyst'],
-          created_at: '2024-11-10T10:00:00Z',
-          updated_at: '2024-11-10T10:00:00Z',
-          is_edited: false,
-          replies: [
-            {
-              id: '2',
-              user_id: 'user2',
-              user_name: 'Market Analyst',
-              user_email: 'analyst@canhav.com',
-              note_text: 'I think the regulatory environment is becoming more favorable. The recent policy changes should benefit the sector.',
-              created_at: '2024-11-10T11:00:00Z',
-              updated_at: '2024-11-10T11:00:00Z',
-              is_edited: false,
-              reply_to_note_id: '1'
-            }
-          ]
-        }
-      ])
+      // No mock data - start with empty notes
+      setNotes([])
     } catch (error) {
       console.error('Error fetching notes:', error)
     } finally {
