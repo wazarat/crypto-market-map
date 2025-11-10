@@ -111,6 +111,7 @@ class UnifiedApiClient {
           employee_count: company.employee_count,
           private_company: company.private_company,
           public_company: company.public_company,
+          ticker_symbol: company.ticker_symbol,
           key_partnerships: company.key_partnerships,
           secp_registration_number: company.secp_registration_number,
           pvara_license_number: company.pvara_license_number,
