@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, ExternalLink, Building2, Globe } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Building2, Globe, Grid3X3, Table } from 'lucide-react'
 import { unifiedApiClient } from '../../../lib/unified-api'
 import { Sector } from '../../../lib/api'
 
@@ -14,6 +14,7 @@ export default function SectorPage() {
   const [sector, setSector] = useState<Sector | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
 
   useEffect(() => {
     const fetchSector = async () => {
@@ -91,14 +92,144 @@ export default function SectorPage() {
           </div>
         )}
 
-        {/* Companies Grid */}
+        {/* Companies Section */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Companies in {sector.name}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sector.companies.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Companies in {sector.name}</h2>
+            
+            {/* View Toggle */}
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Grid3X3 className="h-4 w-4 mr-2" />
+                Grid
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'table'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Table className="h-4 w-4 mr-2" />
+                Table
+              </button>
+            </div>
           </div>
+
+          {/* Grid View */}
+          {viewMode === 'grid' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sector.companies.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))}
+            </div>
+          )}
+
+          {/* Table View */}
+          {viewMode === 'table' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Company Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Year Founded
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Founder/CEO
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Headquarters
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Website
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Verification Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {sector.companies.map((company: any) => (
+                      <tr key={company.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {company.logo_url && (
+                              <img 
+                                src={company.logo_url} 
+                                alt={company.name} 
+                                className="w-8 h-8 rounded-lg mr-3"
+                              />
+                            )}
+                            <Link 
+                              href={`/company/${company.slug}`}
+                              className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                            >
+                              {company.name}
+                            </Link>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {company.year_founded || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {company.founder_ceo_name || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {company.headquarters_location || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {company.website ? (
+                            <a 
+                              href={company.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-indigo-600 hover:text-indigo-700 flex items-center"
+                            >
+                              <Globe className="h-4 w-4 mr-1" />
+                              {(() => {
+                                try {
+                                  return new URL(company.website).hostname
+                                } catch {
+                                  return company.website
+                                }
+                              })()}
+                            </a>
+                          ) : (
+                            'N/A'
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            company.verification_status === 'Verified' 
+                              ? 'bg-green-100 text-green-800'
+                              : company.verification_status === 'Under Review'
+                              ? 'bg-blue-100 text-blue-800'
+                              : company.verification_status === 'Rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {company.verification_status || 'Pending'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
