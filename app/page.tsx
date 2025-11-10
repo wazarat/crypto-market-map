@@ -64,17 +64,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src="/images/canhav-icon.svg" 
-                  alt="Canhav" 
-                  className="w-8 h-8"
-                />
-                <img 
-                  src="/images/canhav-logo.svg" 
-                  alt="Canhav" 
-                  className="h-6"
-                />
+              <div className="flex items-center">
+                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  canhav.io
+                </span>
               </div>
             </div>
             <div className="flex items-center space-x-6">
