@@ -245,35 +245,56 @@ class VASPApiClient {
     return data || []
   }
 
-  // Get companies by category (updated to use many-to-many relationship)
+  // Get companies by category (backward compatible with both old and new schema)
   async getCompaniesByCategory(categorySlug: string): Promise<VASPCompanyWithDetails[]> {
     const client = this.ensureSupabase()
     
-    // First get the category ID
-    const { data: category, error: categoryError } = await client
-      .from('vasp_categories')
-      .select('id')
-      .eq('slug', categorySlug)
-      .single()
-    
-    if (categoryError) throw categoryError
-    if (!category) return []
-    
-    // Then get companies through the junction table
-    const { data, error } = await client
-      .from('company_sectors')
-      .select(`
-        vasp_companies (
+    try {
+      // Try new many-to-many approach first (if migration has been run)
+      const { data: category, error: categoryError } = await client
+        .from('vasp_categories')
+        .select('id')
+        .eq('slug', categorySlug)
+        .single()
+      
+      if (categoryError) throw categoryError
+      if (!category) return []
+      
+      // Try to query the junction table
+      const { data, error } = await client
+        .from('company_sectors')
+        .select(`
+          vasp_companies (
+            *,
+            category:vasp_categories!vasp_companies_category_id_fkey(*)
+          )
+        `)
+        .eq('category_id', category.id)
+      
+      if (error) {
+        // If junction table doesn't exist, fall back to old approach
+        throw error
+      }
+      
+      // Extract and return companies from many-to-many
+      return data?.map((item: any) => item.vasp_companies).filter(Boolean) || []
+      
+    } catch (error) {
+      // Fallback to old single-category approach
+      console.log('📊 Using legacy single-category approach for', categorySlug)
+      
+      const { data, error: legacyError } = await client
+        .from('vasp_companies')
+        .select(`
           *,
-          category:vasp_categories!vasp_companies_category_id_fkey(*)
-        )
-      `)
-      .eq('category_id', category.id)
-    
-    if (error) throw error
-    
-    // Extract and return companies
-    return data?.map((item: any) => item.vasp_companies).filter(Boolean) || []
+          category:vasp_categories!inner(*)
+        `)
+        .eq('category.slug', categorySlug)
+        .order('name')
+
+      if (legacyError) throw legacyError
+      return data || []
+    }
   }
 
   // Admin functions for Canhav

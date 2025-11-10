@@ -36,7 +36,7 @@ class UnifiedApiClient {
                 name: company.name,
                 slug: company.slug,
                 logo_url: company.logo_url,
-                short_summary: company.company_description.substring(0, 100) + '...',
+                short_summary: (company.company_description || company.name || '').substring(0, 100) + '...',
                 website: company.website
               }))
             }
@@ -65,7 +65,7 @@ class UnifiedApiClient {
         return {
           id: category.id,
           name: category.name,
-          slug: category.slug,
+          slug: category.slug, 
           description: category.description,
           company_count: companies.length,
           companies: companies.map(company => ({
