@@ -148,7 +148,7 @@ export default function HomePage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Explore the Crypto Ecosystem
+            PVARA Research Portal
           </motion.h2>
           <motion.p 
             className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"

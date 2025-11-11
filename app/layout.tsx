@@ -10,8 +10,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'CanHav Research - Simplifying Crypto',
-  description: 'Explore the cryptocurrency industry landscape with comprehensive VASP data and insights',
+  title: 'PVARA Research Portal',
+  description: 'Comprehensive research portal for the cryptocurrency industry landscape with VASP data and insights',
 }
 
 export default function RootLayout({
