@@ -5,6 +5,7 @@ import type { User, Session } from '@supabase/supabase-js'
 export interface UserProfile {
   id: string
   email: string
+  username: string
   full_name: string
   company_name?: string
   job_title?: string
@@ -329,6 +330,83 @@ class SupabaseAuthService {
   onAuthStateChange(callback: (event: string, session: Session | null) => void) {
     const client = this.ensureSupabase()
     return client.auth.onAuthStateChange(callback)
+  }
+
+  // Username management functions
+  async checkUsernameAvailable(username: string): Promise<boolean> {
+    const client = this.ensureSupabase()
+    
+    // Validate username format
+    if (!/^[a-z0-9_]+$/.test(username) || username.length < 3 || username.length > 50) {
+      return false
+    }
+    
+    const { data, error } = await client
+      .from('user_profiles')
+      .select('username')
+      .eq('username', username.toLowerCase())
+      .single()
+    
+    if (error && error.code === 'PGRST116') {
+      // No rows returned, username is available
+      return true
+    }
+    
+    return false
+  }
+
+  async updateUsername(userId: string, newUsername: string): Promise<{ success: boolean; error?: string }> {
+    const client = this.ensureSupabase()
+    
+    // Check if username is available
+    const isAvailable = await this.checkUsernameAvailable(newUsername)
+    if (!isAvailable) {
+      return { success: false, error: 'Username is already taken or invalid format' }
+    }
+    
+    const { error } = await client
+      .from('user_profiles')
+      .update({ username: newUsername.toLowerCase() })
+      .eq('id', userId)
+    
+    if (error) {
+      return { success: false, error: error.message }
+    }
+    
+    return { success: true }
+  }
+
+  async getUserByUsername(username: string): Promise<UserProfile | null> {
+    const client = this.ensureSupabase()
+    
+    const { data, error } = await client
+      .from('user_profiles')
+      .select('*')
+      .eq('username', username.toLowerCase())
+      .single()
+    
+    if (error || !data) {
+      return null
+    }
+    
+    return data as UserProfile
+  }
+
+  async searchUsersByUsername(query: string, limit: number = 10): Promise<UserProfile[]> {
+    const client = this.ensureSupabase()
+    
+    const { data, error } = await client
+      .from('user_profiles')
+      .select('*')
+      .ilike('username', `%${query.toLowerCase()}%`)
+      .eq('status', 'approved')
+      .limit(limit)
+    
+    if (error || !data) {
+      return []
+    }
+    
+    return data as UserProfile[]
   }
 }
 
