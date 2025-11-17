@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, Lock, User, Building2 } from 'lucide-react'
-import { useSimpleAuth } from '../../lib/simple-auth-context'
-import { getSubdomainConfig } from '../../lib/subdomain-utils'
+import { useCorporateAuth } from '../../../lib/corporate-auth-context'
+import { useSubdomain } from '../../../lib/subdomain-utils'
 
-export default function LoginPage() {
+export default function CorporateLoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -15,22 +15,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [resetLoading, setResetLoading] = useState(false)
-  const [resetMessage, setResetMessage] = useState('')
 
-  const { signIn, isAuthenticated } = useSimpleAuth()
+  const { signIn, isAuthenticated, corporateClient } = useCorporateAuth()
+  const subdomainConfig = useSubdomain()
   const router = useRouter()
-
-  // Check if user is on corporate subdomain and redirect
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const config = getSubdomainConfig(window.location.hostname)
-      if (config.type !== 'main') {
-        router.replace('/corporate/login')
-        return
-      }
-    }
-  }, [router])
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -67,26 +55,27 @@ export default function LoginPage() {
   }
 
   const handleForgotPassword = async () => {
-    setError('Password reset feature coming soon. Please contact admin for password reset.')
+    setError('Password reset feature coming soon. Please contact your corporate admin for password reset.')
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <img 
-              src="/images/canhav-icon.svg" 
-              alt="Canhav" 
-              className="w-16 h-16"
-            />
+            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Building2 className="w-8 h-8 text-white" />
+            </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
-            Canhav
+            {subdomainConfig.theme?.brandName || 'Corporate Portal'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to access the VASP database
+            {corporateClient ? `${corporateClient} Corporate Access` : 'Corporate Portal Access'}
+          </p>
+          <p className="mt-1 text-xs text-blue-600">
+            Sign in with your corporate credentials
           </p>
         </div>
 
@@ -99,16 +88,10 @@ export default function LoginPage() {
               </div>
             )}
 
-            {resetMessage && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                <p className="text-sm text-green-600">{resetMessage}</p>
-              </div>
-            )}
-
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                Corporate Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -121,8 +104,8 @@ export default function LoginPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter your email address"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter your corporate email address"
                 />
               </div>
             </div>
@@ -143,7 +126,7 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter your password"
                 />
                 <button
@@ -165,10 +148,9 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleForgotPassword}
-                disabled={resetLoading}
-                className="text-sm text-indigo-600 hover:text-indigo-500 disabled:opacity-50"
+                className="text-sm text-blue-600 hover:text-blue-500"
               >
-                {resetLoading ? 'Sending...' : 'Forgot your password?'}
+                Forgot your password?
               </button>
             </div>
 
@@ -177,7 +159,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex items-center">
@@ -185,7 +167,7 @@ export default function LoginPage() {
                     Signing in...
                   </div>
                 ) : (
-                  'Sign in'
+                  'Sign in to Corporate Portal'
                 )}
               </button>
             </div>
@@ -194,28 +176,46 @@ export default function LoginPage() {
           {/* Footer Links */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Need corporate access?{' '}
               <Link
-                href="/signup"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                href="/corporate/signup"
+                className="font-medium text-blue-600 hover:text-blue-500"
               >
-                Request access
+                Request corporate account
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Info Box */}
+        {/* Corporate Info Box */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="text-center">
             <h3 className="text-sm font-medium text-blue-900 mb-2">
-              Access Information
+              Corporate Portal Access
             </h3>
             <p className="text-xs text-blue-700">
-              All new accounts require admin approval before access is granted. 
-              Please contact the administrator if you need immediate access.
+              This portal is exclusively for {corporateClient || 'corporate'} employees and authorized partners. 
+              All corporate accounts require admin approval before access is granted.
             </p>
+            {corporateClient && (
+              <p className="text-xs text-blue-600 mt-2 font-medium">
+                Authorized for: {corporateClient} Corporate Users
+              </p>
+            )}
           </div>
+        </div>
+
+        {/* Link to Main Portal */}
+        <div className="text-center">
+          <p className="text-xs text-gray-500">
+            Looking for the main portal?{' '}
+            <a
+              href="https://canhav.io/login"
+              className="text-blue-600 hover:text-blue-500 font-medium"
+            >
+              Go to main login
+            </a>
+          </p>
         </div>
       </div>
     </div>

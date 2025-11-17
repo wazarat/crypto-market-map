@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { SimpleAuthProvider } from '../lib/simple-auth-context'
+import SubdomainAwareLayout from '../components/SubdomainAwareLayout'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -30,11 +30,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} font-inter-tight`}>
-        <SimpleAuthProvider>
-          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
-            {children}
-          </div>
-        </SimpleAuthProvider>
+        <SubdomainAwareLayout>
+          {children}
+        </SubdomainAwareLayout>
       </body>
     </html>
   )
