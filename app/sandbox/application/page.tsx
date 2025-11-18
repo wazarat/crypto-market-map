@@ -8,31 +8,55 @@ const applicationSteps = [
   {
     step: 'Submission',
     timeline: 'Initial',
-    requirements: 'Submit the application as per the prescribed form with the requisite fee.',
+    description: 'This is the initial action taken by the applicant to formally begin the sandbox application process.',
+    requirements: 'Key Requirements & Actions:',
+    details: [
+      'Application Form Completion: Fill out the official PVARA Sandbox application form in its entirety. Ensure all mandatory fields are completed accurately.',
+      'Requisite Fee Payment: Submit the specified, non-refundable application fee as outlined by PVARA. Attach proof of payment.',
+      'Supporting Documentation: Include any additional documents explicitly requested in the application form (e.g., company registration, business plan summary).',
+      'Submission Method: Submit the complete application package through the designated channel (e.g., online portal, secure email, physical submission).'
+    ],
     status: 'pending'
   },
   {
     step: 'Acknowledgment',
     timeline: 'Within 5 working days of receipt',
-    requirements: 'PVARA issues an acknowledgment confirming receipt.',
+    description: 'This step confirms that PVARA has successfully received the application.',
+    requirements: 'Key Requirements & Actions (PVARA\'s Actions):',
+    details: [
+      'Receipt Confirmation: PVARA will issue an official acknowledgment of receipt for the submitted application.',
+      'Communication Channel: The acknowledgment will be sent to the primary contact person/email address provided in the application form.',
+      'Purpose: To inform the applicant that their submission has been successfully logged and will proceed to the next stage.'
+    ],
     status: 'pending'
   },
   {
     step: 'Preliminary Screening',
     timeline: 'Within 7 working days of receipt (for completeness)',
-    requirements: 'PVARA reviews for completeness and eligibility. Mandatory elements must include:',
+    description: 'This stage is an initial check by PVARA to ensure the application is complete and meets fundamental eligibility criteria before a deeper review.',
+    requirements: 'Key Requirements & Actions (PVARA\'s Focus & Applicant\'s Preparation):',
     details: [
-      'Detailed model description',
-      'Preliminary risk assessments (AML/CTF, cybersecurity)',
-      'Evidence of innovation',
-      'Shariah compliance considerations (if applicable)'
+      'Completeness Check: Verification that all mandatory sections of the application form are filled out and all required supporting documents have been attached.',
+      'Detailed Model Description: A clear explanation of the proposed virtual asset business model, its purpose, and how it operates.',
+      'Preliminary Risk Assessments: Initial assessment covering Anti-Money Laundering (AML) / Counter-Terrorist Financing (CTF) and Cybersecurity measures.',
+      'Evidence of Innovation: Clearly articulate how the proposed solution is innovative, new to the Pakistani market, or offers significant improvements over existing solutions.',
+      'Shariah Compliance Considerations (If Applicable): If the model involves Islamic finance principles, initial considerations and approaches to ensure compliance should be presented.',
+      'Feedback Process: If the application is deemed incomplete, PVARA may request additional information or clarification from the applicant within this timeframe.'
     ],
     status: 'pending'
   },
   {
     step: 'Initial Screening',
     timeline: 'Within 20 working days of acknowledgment',
-    requirements: 'High-level check against exclusion criteria, focusing on whether the model involves virtual assets and no prohibited activities (e.g., unlicensed trading).',
+    description: 'This screening dives slightly deeper to ensure the proposed model fundamentally aligns with PVARA\'s regulatory scope and doesn\'t involve prohibited activities.',
+    requirements: 'Key Requirements & Actions (PVARA\'s Focus & Applicant\'s Clarity):',
+    details: [
+      'Virtual Asset Involvement: Confirm that the proposed model genuinely involves virtual assets as defined by PVARA.',
+      'Prohibited Activities Check: Ensure the model does not involve activities explicitly prohibited by PVARA regulations or Pakistani law (e.g., operating an unlicensed exchange outside the sandbox).',
+      'Regulatory Scope: Confirm the project falls within the general purview and mandate of PVARA\'s regulatory authority.',
+      'Innovation & Benefit Justification: PVARA will assess if the project truly has the potential to offer genuine innovation and tangible benefits to the Pakistani financial ecosystem.',
+      'Decision: Based on this screening, the application will either be moved forward for detailed evaluation or rejected if it clearly falls outside the sandbox\'s scope.'
+    ],
     status: 'pending'
   }
 ]
@@ -118,15 +142,18 @@ export default function ApplicationPage() {
 
                 {/* Requirements */}
                 <div className="lg:col-span-9">
-                  <h5 className="font-semibold text-gray-800 mb-2">Key Requirements & Actions</h5>
-                  <p className="text-gray-700 mb-3">{step.requirements}</p>
+                  <div className="mb-4">
+                    <p className="text-gray-700 leading-relaxed mb-4">{step.description}</p>
+                  </div>
+                  
+                  <h5 className="font-semibold text-gray-800 mb-3">{step.requirements}</h5>
                   
                   {step.details && (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {step.details.map((detail, detailIndex) => (
-                        <div key={detailIndex} className="flex items-start space-x-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-700 text-sm">{detail}</span>
+                        <div key={detailIndex} className="flex items-start space-x-3 p-3 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                          <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
+                          <span className="text-gray-700 text-sm leading-relaxed">{detail}</span>
                         </div>
                       ))}
                     </div>
