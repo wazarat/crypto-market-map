@@ -45,9 +45,9 @@ const sandboxLimits = [
     icon: DollarSign
   },
   {
-    feature: 'Rosts',
+    feature: 'Users',
     details: '500 Participants',
-    example: 'Rosts',
+    example: 'Users',
     icon: Users
   }
 ]
